@@ -30,46 +30,6 @@ function PixelCloud({ width = 96 }: { width?: number }) {
   );
 }
 
-function QuestionBlock({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={PIX}>
-      {/* Outer border */}
-      <rect width="8" height="8" fill="#5c2e00" />
-      {/* Body */}
-      <rect x="1" y="1" width="6" height="6" fill="#c88000" />
-      {/* Highlight edges */}
-      <rect x="1" y="1" width="5" height="1" fill="#f0b800" />
-      <rect x="1" y="1" width="1" height="5" fill="#f0b800" />
-      {/* Shadow edges */}
-      <rect x="2" y="7" width="6" height="1" fill="#7a4000" />
-      <rect x="7" y="2" width="1" height="6" fill="#7a4000" />
-      {/* ? symbol */}
-      <rect x="3" y="2" width="2" height="1" fill="#fff" />
-      <rect x="4" y="3" width="1" height="1" fill="#fff" />
-      <rect x="3" y="4" width="2" height="1" fill="#fff" />
-      <rect x="3" y="6" width="2" height="1" fill="#fff" />
-    </svg>
-  );
-}
-
-function BrickBlock({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 8 8" style={PIX}>
-      {/* Background mortar */}
-      <rect width="8" height="8" fill="#7a2800" />
-      {/* Brick tiles */}
-      <rect x="0" y="0" width="3" height="3" fill="#c84c0c" />
-      <rect x="4" y="0" width="4" height="3" fill="#c84c0c" />
-      <rect x="0" y="4" width="4" height="4" fill="#c84c0c" />
-      <rect x="5" y="4" width="3" height="4" fill="#c84c0c" />
-      {/* Highlights */}
-      <rect x="0" y="0" width="1" height="1" fill="#e86428" />
-      <rect x="4" y="0" width="1" height="1" fill="#e86428" />
-      <rect x="0" y="4" width="1" height="1" fill="#e86428" />
-      <rect x="5" y="4" width="1" height="1" fill="#e86428" />
-    </svg>
-  );
-}
 
 function GreenPipe({ pipeHeight = 120 }: { pipeHeight?: number }) {
   const W = 56;
@@ -140,19 +100,7 @@ const CLOUDS = [
   { id: 7, topPct: 17, scale: 1.4, dur: 63, delay: -35, w: 96  },
 ];
 
-const Q_BLOCKS = [
-  { leftPct: 16, bottom: "32vh", animDelay: "0s",    animDur: "2.1s" },
-  { leftPct: 44, bottom: "40vh", animDelay: "0.6s",  animDur: "2.4s" },
-  { leftPct: 70, bottom: "30vh", animDelay: "1.2s",  animDur: "1.9s" },
-  { leftPct: 58, bottom: "44vh", animDelay: "0.3s",  animDur: "2.7s" },
-];
 
-const BRICKS = [
-  { leftPct: 28, bottom: "32vh" },
-  { leftPct: 33, bottom: "32vh" },
-  { leftPct: 38, bottom: "32vh" },
-  { leftPct: 33, bottom: "37vh" },
-];
 
 /* ── Ground constants (px from viewport bottom) ─────────── */
 const GROUND_H      = 88; // total ground strip height
@@ -230,40 +178,6 @@ export default function MarioBackground() {
       <div style={{ position: "absolute", bottom: GROUND_H, right: "24%", zIndex: 3 }}>
         <GreenPipe pipeHeight={70} />
       </div>
-
-      {/* ── Question blocks ──────────────────────── */}
-      {Q_BLOCKS.map((b, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left:   `${b.leftPct}%`,
-            bottom:  b.bottom,
-            zIndex:  3,
-            animation: `marioBob ${b.animDur} ease-in-out infinite`,
-            animationDelay: b.animDelay,
-            filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.35))",
-          }}
-        >
-          <QuestionBlock size={40} />
-        </div>
-      ))}
-
-      {/* ── Brick blocks ─────────────────────────── */}
-      {BRICKS.map((b, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left:   `${b.leftPct}%`,
-            bottom:  b.bottom,
-            zIndex:  3,
-            filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.3))",
-          }}
-        >
-          <BrickBlock size={40} />
-        </div>
-      ))}
 
       {/* ── Ground – grass cap ───────────────────── */}
       <div
