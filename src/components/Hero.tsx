@@ -1,6 +1,12 @@
 import { motion } from "framer-motion";
+import CharacterSelect from "./CharacterSelect";
 
-export default function Hero() {
+interface HeroProps {
+  selectedCharacter: string | null;
+  onSelectCharacter: (character: string) => void;
+}
+
+export default function Hero({ selectedCharacter, onSelectCharacter }: HeroProps) {
   return (
     <motion.section
       className="flex flex-col items-center justify-center pt-24 pb-16 px-4 text-center"
@@ -84,21 +90,8 @@ export default function Hero() {
         </p>
       </div>
 
-      {/* Coin row under panel */}
-      <div style={{ display: "flex", gap: 12, marginTop: "1.5rem" }}>
-        {["🪙", "🪙", "🪙"].map((c, i) => (
-          <span
-            key={i}
-            style={{
-              fontSize: 20,
-              animation: `marioSparkle ${1.2 + i * 0.2}s ease-in-out infinite`,
-              animationDelay: `${i * 0.3}s`,
-            }}
-          >
-            {c}
-          </span>
-        ))}
-      </div>
+      {/* Character select */}
+      <CharacterSelect selected={selectedCharacter} onSelect={onSelectCharacter} />
     </motion.section>
   );
 }

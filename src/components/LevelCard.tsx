@@ -131,7 +131,6 @@ function ForestScene() {
           <rect x={x + 5} y="36" width="4"  height="12" fill="#6b3800" />
           <polygon points={`${x + 7},17 ${x + 15},29 ${x - 1},29`} fill="#1a5800" />
           <polygon points={`${x + 7},23 ${x + 17},35 ${x - 3},35`} fill="#228a00" />
-          <polygon points={`${x + 7},29 ${x + 19},41 ${x - 5},41`} fill="#2ea000" />
         </g>
       ))}
       {/* Mario mushroom */}
@@ -231,10 +230,10 @@ const SCENES = {
 } as const;
 
 const LEVEL_IDS: Record<keyof typeof SCENES, string> = {
-  mountain: "WORLD 1-1",
-  forest:   "WORLD 2-1",
-  castle:   "WORLD 3-4",
-  temple:   "WORLD 4-1",
+  mountain: "GitHub Repos",
+  forest:   "Hugging Face",
+  castle:   "Resume",
+  temple:   "SafrSight",
 };
 
 /* ── Mountain: peak silhouette ── */
@@ -324,9 +323,10 @@ export interface LevelCardProps {
   icon: IconType;
   accentColor: string;
   href?: string;
-  onClick?: () => void;
+  isResume?: boolean;
   index: number;
   scene: keyof typeof SCENES;
+  onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
 }
 
 export default function LevelCard({
@@ -335,19 +335,19 @@ export default function LevelCard({
   icon: Icon,
   accentColor,
   href,
-  onClick,
+  isResume,
   index,
   scene,
+  onGameStart,
 }: LevelCardProps) {
   const SceneComp = SCENES[scene];
   const levelId   = LEVEL_IDS[scene];
   const [hovered,  setHovered]  = useState(false);
   const [descOpen, setDescOpen] = useState(false);
 
-  /* Navigate (or call onClick) — used by the SVG polygon click target */
+  /* All card clicks now route through the game first */
   const handleCardClick = () => {
-    if (href) window.open(href, "_blank", "noopener,noreferrer");
-    else onClick?.();
+    onGameStart(scene, href, isResume);
   };
 
   const sceneEl = (
@@ -357,8 +357,9 @@ export default function LevelCard({
     <div
       style={{
         position:   "relative",
-        width:      "100%",
-        height:     200,
+        width:      200,
+        height:     130,
+        margin:     "0 auto",
         clipPath:   CLIP_PATHS[scene],
         filter:     hovered
           ? `drop-shadow(0 0 18px ${accentColor}99) drop-shadow(3px 4px 0 rgba(0,0,0,0.8))`
@@ -376,7 +377,7 @@ export default function LevelCard({
           left:          "50%",
           transform:     "translateX(-50%)",
           fontFamily:    '"Press Start 2P", monospace',
-          fontSize:      6,
+          fontSize:      10,
           color:         "white",
           whiteSpace:    "nowrap",
           textShadow:    "1px 1px 0 #000, -1px 0 0 #000, 0 -1px 0 #000",
@@ -431,39 +432,42 @@ export default function LevelCard({
       onHoverEnd={() => setHovered(false)}
       style={{ position: "relative", cursor: "default" }}
     >
-      {/* ── Icon badge — floats above the scene, NOT clipped ── */}
-      <div
-        style={{
-          position:       "absolute",
-          top:            0,
-          left:           "50%",
-          transform:      "translateX(-50%)",
-          width:          54,
-          height:         54,
-          background:     accentColor,
-          border:         "3px solid #000",
-          boxShadow:      [
-            "3px 3px 0 rgba(0,0,0,0.55)",
-            "inset 3px 3px 0 rgba(255,255,255,0.28)",
-            "inset -3px -3px 0 rgba(0,0,0,0.22)",
-          ].join(", "),
-          display:        "flex",
-          alignItems:     "center",
-          justifyContent: "center",
-          zIndex:         10,
-          transition:     "box-shadow 0.3s ease",
-        }}
-      >
-        <Icon size={27} color="#000" />
-      </div>
+      {/* ── Shared 200px container: icon badge, scene, footer all aligned ── */}
+      <div style={{ position: "relative", width: 200, margin: "0 auto" }}>
 
-      {/* Scene pushed down so icon badge has visual space above it */}
-      <div style={{ marginTop: 26 }}>
-        {sceneEl}
-      </div>
+        {/* Icon badge — floats above the scene */}
+        <div
+          style={{
+            position:       "absolute",
+            top:            0,
+            left:           "50%",
+            transform:      "translateX(-50%)",
+            width:          46,
+            height:         46,
+            background:     accentColor,
+            border:         "3px solid #000",
+            boxShadow:      [
+              "3px 3px 0 rgba(0,0,0,0.55)",
+              "inset 3px 3px 0 rgba(255,255,255,0.28)",
+              "inset -3px -3px 0 rgba(0,0,0,0.22)",
+            ].join(", "),
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            zIndex:         10,
+            transition:     "box-shadow 0.3s ease",
+          }}
+        >
+          <Icon size={22} color="#000" />
+        </div>
 
-      {/* ── Footer: ? block left-aligned, title centred ── */}
-      <div style={{ padding: "14px 0 8px" }}>
+        {/* Scene pushed down so icon badge has visual space above it */}
+        <div style={{ marginTop: 20 }}>
+          {sceneEl}
+        </div>
+
+        {/* ── Footer: ? block left-aligned, title centred ── */}
+        <div style={{ padding: "14px 0 8px" }}>
         {/* Three-slot row: [? block] [title centred] [spacer] */}
         <div
           style={{
@@ -482,7 +486,7 @@ export default function LevelCard({
               style={{ cursor: "pointer", lineHeight: 0 }}
             >
               <svg
-                width="40" height="40" viewBox="0 0 8 8"
+                width="20" height="20" viewBox="0 0 8 8"
                 style={{
                   imageRendering: "pixelated" as const,
                   display:        "block",
@@ -559,27 +563,14 @@ export default function LevelCard({
             )}
           </div>
 
-          {/* Centre slot — takes remaining space, title is truly centred */}
-          <div style={{ flex: 1, textAlign: "center" }}>
-            <span
-              style={{
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize:   10,
-                color:      accentColor,
-                lineHeight: 1.8,
-                textShadow: "2px 2px 0 rgba(0,0,0,0.7)",
-              }}
-            >
-              {title}
-            </span>
-          </div>
-
-          {/* Right spacer balances the ? block so the title stays centred */}
-          <div style={{ flexShrink: 0, width: 40 }} />
+          {/* Centre slot — empty, keeps ? block left-aligned */}
+          <div style={{ flex: 1 }} />
         </div>
       </div>
+
+      </div>{/* end shared 200px container */}
     </motion.div>
   );
 
-  return <div style={{ paddingTop: 28 }}>{inner}</div>;
+  return <div style={{ paddingTop: 24 }}>{inner}</div>;
 }

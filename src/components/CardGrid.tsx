@@ -6,11 +6,10 @@ import LevelCard from "./LevelCard";
 import type { LevelCardProps } from "./LevelCard";
 
 interface CardGridProps {
-  onResumeClick: () => void;
+  onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
 }
 
-type CardData = Omit<LevelCardProps, "index" | "onClick"> & {
-  isResume?: boolean;
+type CardData = Omit<LevelCardProps, "index" | "onGameStart"> & {
   description: string;
 };
 
@@ -49,22 +48,43 @@ const cards: CardData[] = [
   },
 ];
 
-export default function CardGrid({ onResumeClick }: CardGridProps) {
+const DIAMOND_POSITIONS: { card: CardData; col: number; row: number }[] = [
+  { card: cards[2], col: 2, row: 1 }, // Resume     — top center
+  { card: cards[0], col: 1, row: 2 }, // GitHub     — middle left
+  { card: cards[1], col: 3, row: 2 }, // Hugging Face — middle right
+  { card: cards[3], col: 2, row: 3 }, // SafrSight  — bottom center
+];
+
+export default function CardGrid({ onGameStart }: CardGridProps) {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 pb-28">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-16 pt-4">
-        {cards.map((card, i) => (
-          <LevelCard
+      <div
+        style={{
+          display:             "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gridTemplateRows:    "auto auto auto",
+          rowGap:              "8px",
+          columnGap:           "0px",
+          paddingTop:          "16px",
+        }}
+      >
+        {DIAMOND_POSITIONS.map(({ card, col, row }, i) => (
+          <div
             key={card.title}
-            index={i}
-            title={card.title}
-            description={card.description}
-            icon={card.icon}
-            accentColor={card.accentColor}
-            href={card.isResume ? undefined : card.href}
-            scene={card.scene}
-            onClick={card.isResume ? onResumeClick : undefined}
-          />
+            style={{ gridColumn: col, gridRow: row }}
+          >
+            <LevelCard
+              index={i}
+              title={card.title}
+              description={card.description}
+              icon={card.icon}
+              accentColor={card.accentColor}
+              href={card.href}
+              isResume={card.isResume}
+              scene={card.scene}
+              onGameStart={onGameStart}
+            />
+          </div>
         ))}
       </div>
     </section>
