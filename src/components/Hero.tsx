@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
-import CharacterSelect from "./CharacterSelect";
 
 interface HeroProps {
   selectedCharacter: string | null;
-  onSelectCharacter: (character: string) => void;
+  onOpenCharacterModal: () => void;
 }
 
-export default function Hero({ selectedCharacter, onSelectCharacter }: HeroProps) {
+export default function Hero({ selectedCharacter, onOpenCharacterModal }: HeroProps) {
   return (
     <motion.section
-      className="flex flex-col items-center justify-center pt-24 pb-16 px-4 text-center"
+      className="flex flex-col items-center justify-center pt-3 pb-2 px-4 text-center"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
@@ -18,7 +17,7 @@ export default function Hero({ selectedCharacter, onSelectCharacter }: HeroProps
       <div
         style={{
           fontFamily: '"Press Start 2P", monospace',
-          background: "rgba(0,0,0,0.55)",
+          background: "rgba(0, 0, 0, 0.55)",
           border: "4px solid #c88000",
           boxShadow: "0 0 0 4px #5c2e00, 0 8px 32px rgba(0,0,0,0.5)",
           padding: "2rem 2.5rem",
@@ -32,15 +31,70 @@ export default function Hero({ selectedCharacter, onSelectCharacter }: HeroProps
           style={{
             display: "flex",
             justifyContent: "space-between",
+            alignItems: "flex-end",
             color: "#fff",
             fontSize: 10,
             marginBottom: "1.5rem",
             letterSpacing: "0.05em",
+            fontFamily: '"Press Start 2P", monospace',
           }}
         >
-          <span>SCORE</span>
-          <span style={{ color: "#ffd700" }}>★ 1000000</span>
-          <span>TIME <span style={{ color: "#ffd700" }}>∞</span></span>
+          {/* LinkedIn */}
+          <a
+            href="https://www.linkedin.com/in/hen-israel/"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="LinkedIn"
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 6,
+              textDecoration: "none",
+              color: "#0af",
+              fontSize: 10,
+              letterSpacing: "0.07em",
+            }}
+          >
+            {/* Pixel LinkedIn icon */}
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+              style={{ imageRendering: "pixelated", display: "block" }}
+              shapeRendering="crispEdges"
+            >
+              <rect width="20" height="20" fill="#0a66c2" />
+              <rect x="2" y="2" width="3" height="3" fill="#fff" />
+              <rect x="2" y="7" width="3" height="10" fill="#fff" />
+              <rect x="8" y="7" width="3" height="10" fill="#fff" />
+              <rect x="11" y="7" width="3" height="3" fill="#fff" />
+              <rect x="14" y="10" width="3" height="7" fill="#fff" />
+            </svg>
+
+            LINKEDIN
+          </a>
+
+          {/* Score */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              color: "#ffd700",
+            }}
+          >
+            <span>SCORE</span>
+            <span
+              style={{
+                display: "inline-block",
+                transform: "translateY(-2.5px)",
+              }}
+            >
+              ★
+            </span>
+            <span>1000000</span>
+          </div>
         </div>
 
         {/* Divider */}
@@ -76,22 +130,40 @@ export default function Hero({ selectedCharacter, onSelectCharacter }: HeroProps
         {/* Divider */}
         <div style={{ height: 3, background: "#c88000", margin: "1.5rem 0" }} />
 
-        {/* Press-start prompt */}
-        <p
-          style={{
-            fontSize: 9,
-            color: "#fff",
-            letterSpacing: "0.1em",
-            animation: "marioBlink 1.1s step-end infinite",
-            margin: 0,
-          }}
-        >
-          ▼ SELECT YOUR LEVEL ▼
-        </p>
+        {/* Press-start prompt / character button */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          <button
+            onClick={onOpenCharacterModal}
+            style={{
+              fontFamily: '"Press Start 2P", monospace',
+              fontSize: 9,
+              color: "#fff",
+              letterSpacing: "0.1em",
+              animation: "marioBlink 1.1s step-end infinite",
+              margin: 0,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            ▼ CHOOSE YOUR CHARACTER ▼
+          </button>
+          {selectedCharacter && (
+            <span
+              style={{
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: 7,
+                color: "#ffd700",
+                letterSpacing: "0.05em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              ► {selectedCharacter.toUpperCase()}
+            </span>
+          )}
+        </div>
       </div>
-
-      {/* Character select */}
-      <CharacterSelect selected={selectedCharacter} onSelect={onSelectCharacter} />
     </motion.section>
   );
 }
