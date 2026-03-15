@@ -57,21 +57,26 @@ const DIAMOND_POSITIONS: { card: CardData; col: number; row: number }[] = [
 
 export default function CardGrid({ onGameStart }: CardGridProps) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 pb-28">
+    <section className="mx-auto w-full max-w-3xl px-4 pb-2">
       <div
         style={{
           display:             "grid",
           gridTemplateColumns: "1fr 1fr 1fr",
           gridTemplateRows:    "auto auto auto",
-          rowGap:              "8px",
+          rowGap:              "0px",
           columnGap:           "0px",
-          paddingTop:          "16px",
+          paddingTop:          "0px"
         }}
       >
         {DIAMOND_POSITIONS.map(({ card, col, row }, i) => (
           <div
             key={card.title}
-            style={{ gridColumn: col, gridRow: row }}
+            style={{ 
+              gridColumn: col, 
+              gridRow: row,
+              marginBottom: row === 1 ? "-100px" : undefined, // pull top card down
+              marginTop: row === 3 ? "-100px" : undefined,    // pull bottom card up
+             }}
           >
             <LevelCard
               index={i}

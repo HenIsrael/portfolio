@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import CardGrid from "./components/CardGrid";
 import ResumeModal from "./components/ResumeModal";
 import GameModal from "./components/GameModal";
+import CharacterModal from "./components/CharacterModal";
 import MarioBackground from "./components/MarioBackground";
 
 type PendingWorld = {
@@ -16,6 +17,7 @@ type PendingWorld = {
 export default function App() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
+  const [characterModalOpen, setCharacterModalOpen] = useState(false);
   const [pendingWorld, setPendingWorld] = useState<PendingWorld | null>(null);
 
   const handleGameStart = (scene: string, href?: string, isResume?: boolean) => {
@@ -43,14 +45,21 @@ export default function App() {
   return (
     <>
       <MarioBackground />
-      <main className="min-h-screen" style={{ paddingBottom: 120 }}>
+      <main className="min-h-screen" style={{ paddingBottom: 8 }}>
         <Hero
           selectedCharacter={selectedCharacter}
-          onSelectCharacter={setSelectedCharacter}
+          onOpenCharacterModal={() => setCharacterModalOpen(true)}
         />
         <CardGrid onGameStart={handleGameStart} />
         <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
       </main>
+
+      <CharacterModal
+        isOpen={characterModalOpen}
+        selectedCharacter={selectedCharacter}
+        onSelect={setSelectedCharacter}
+        onClose={() => setCharacterModalOpen(false)}
+      />
 
       <AnimatePresence>
         {pendingWorld && (
