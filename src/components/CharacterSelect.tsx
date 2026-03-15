@@ -24,18 +24,7 @@ export default function CharacterSelect({ selected, onSelect }: CharacterSelectP
         gap: "1rem",
       }}
     >
-      {/* Header */}
-      <p
-        style={{
-          fontSize: 8,
-          color: "#52ff52",
-          letterSpacing: "0.08em",
-          margin: 0,
-          textAlign: "center",
-        }}
-      >
-        - CHOOSE YOUR CHARACTER -
-      </p>
+
 
       {/* Character cards row */}
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", justifyContent: "center" }}>
