@@ -2,17 +2,31 @@ import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
+import MarioSprite from "./characters/MarioSprite";
 
 interface GameModalProps {
   worldKey: string;
   worldTitle: string;
+  selectedCharacter: string;
+  onSelectCharacter: (character: string) => void;
   onWin: () => void;
   onClose: () => void;
 }
 
 const FONT = '"Press Start 2P", monospace';
 
-export default function GameModal({ worldKey, worldTitle, onWin, onClose }: GameModalProps) {
+const CHARACTERS: { id: string; label: string; locked: boolean }[] = [
+  { id: "mario", label: "MARIO", locked: false },
+  { id: "???1",  label: "???",   locked: true  },
+  { id: "???2",  label: "???",   locked: true  },
+];
+
+
+export default function GameModal({
+  worldKey, worldTitle,
+  selectedCharacter, onSelectCharacter,
+  onWin, onClose,
+}: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { gameState } = useGameEngine(canvasRef, worldKey, onWin);
 
@@ -42,40 +56,37 @@ export default function GameModal({ worldKey, worldTitle, onWin, onClose }: Game
         style={{ position: "relative", zIndex: 10 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Title bar */}
+        {/* Top strip — hint + close */}
         <div
           style={{
-            fontFamily: FONT,
-            background: "rgba(0,0,0,0.85)",
-            border: "4px solid #c88000",
+            fontFamily:   FONT,
+            background:   "rgba(0,0,0,0.85)",
+            border:       "4px solid #c88000",
             borderBottom: "none",
-            boxShadow: "0 0 0 4px #5c2e00",
-            padding: "10px 16px",
-            display: "flex",
-            alignItems: "center",
+            boxShadow:    "0 0 0 4px #5c2e00",
+            padding:      "8px 16px",
+            display:      "flex",
+            alignItems:   "center",
             justifyContent: "space-between",
             gap: 12,
           }}
         >
-          <span style={{ fontSize: 9, color: "#ffd700", letterSpacing: "0.08em" }}>
-            ► {worldTitle.toUpperCase()}
-          </span>
-          <span style={{ fontSize: 8, color: "#52ff52", letterSpacing: "0.05em" }}>
+          <span style={{ fontSize: 8, color: "#52ff52", letterSpacing: "0.06em" }}>
             COLLECT ALL COINS TO WIN
           </span>
           <button
             onClick={onClose}
             style={{
               background: "rgba(255,255,255,0.1)",
-              border: "2px solid #555",
-              color: "#aaa",
-              cursor: "pointer",
-              width: 28,
-              height: 28,
-              display: "flex",
+              border:     "2px solid #555",
+              color:      "#aaa",
+              cursor:     "pointer",
+              width:      28,
+              height:     28,
+              display:    "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: 0,
+              padding:    0,
               flexShrink: 0,
               transition: "background 0.15s, color 0.15s",
             }}
@@ -93,23 +104,98 @@ export default function GameModal({ worldKey, worldTitle, onWin, onClose }: Game
           </button>
         </div>
 
-        {/* Canvas wrapper */}
+        {/* Canvas wrapper — character selector floats on top of the level */}
         <div style={{ position: "relative" }}>
           <canvas
             ref={canvasRef}
             width={CANVAS_W}
             height={CANVAS_H}
             style={{
-              display: "block",
-              maxWidth: "min(800px, calc(100vw - 32px))",
-              width: "100%",
-              height: "auto",
+              display:        "block",
+              maxWidth:       "min(800px, calc(100vw - 32px))",
+              width:          "100%",
+              height:         "auto",
               imageRendering: "pixelated",
-              border: "4px solid #c88000",
-              boxShadow: "0 0 0 4px #5c2e00",
-              outline: "none",
+              border:         "4px solid #c88000",
+              boxShadow:      "0 0 0 4px #5c2e00",
+              outline:        "none",
             }}
           />
+
+          {/* Character selector — floating overlay centred at top of canvas */}
+          <div
+            style={{
+              position:       "absolute",
+              top:            12,
+              left:           "50%",
+              transform:      "translateX(-50%)",
+              zIndex:         20,
+              display:        "flex",
+              flexDirection:  "column",
+              alignItems:     "center",
+              gap:            6,
+            }}
+          >
+            {/* Character buttons row */}
+            <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+              {CHARACTERS.map((char) => {
+                const isSelected = !char.locked && selectedCharacter === char.id;
+                return (
+                  <button
+                    key={char.id}
+                    disabled={char.locked}
+                    onClick={() => !char.locked && onSelectCharacter(char.id)}
+                    title={char.locked ? "Coming soon" : `Play as ${char.label}`}
+                    style={{
+                      display:        "flex",
+                      flexDirection:  "column",
+                      alignItems:     "center",
+                      gap:            3,
+                      background:     isSelected ? "rgba(255,215,0,0.18)" : "rgba(0,0,0,0.5)",
+                      border:         isSelected ? "2px solid #ffd700" : "2px solid #555",
+                      boxShadow:      isSelected ? "0 0 0 2px #c88000, 0 0 14px rgba(255,215,0,0.4)" : "none",
+                      padding:        "4px 8px",
+                      cursor:         char.locked ? "not-allowed" : "pointer",
+                      opacity:        char.locked ? 0.3 : 1,
+                      transition:     "border 0.15s, box-shadow 0.15s, background 0.15s",
+                      outline:        "none",
+                      imageRendering: "pixelated",
+                      fontFamily:     FONT,
+                    }}
+                  >
+                    {char.locked ? (
+                      <span style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", filter: "grayscale(1)", fontSize: 18 }}>
+                        🔒
+                      </span>
+                    ) : (
+                      <MarioSprite size={32} />
+                    )}
+                    <span style={{ fontSize: 6, color: isSelected ? "#ffd700" : "#666", letterSpacing: "0.05em" }}>
+                      {char.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 3 pixel-art hearts — below the whole characters row */}
+            <div style={{ display: "flex", gap: 10 }}>
+              {[0, 1, 2].map((i) => (
+                <svg key={i} width="16" height="16" viewBox="0 0 10 10" style={{ imageRendering: "pixelated" }}>
+                  <rect x="1" y="2" width="3" height="1" fill="#e52213" />
+                  <rect x="6" y="2" width="3" height="1" fill="#e52213" />
+                  <rect x="0" y="3" width="4" height="2" fill="#e52213" />
+                  <rect x="5" y="3" width="4" height="2" fill="#e52213" />
+                  <rect x="0" y="5" width="9" height="2" fill="#e52213" />
+                  <rect x="1" y="7" width="7" height="1" fill="#e52213" />
+                  <rect x="2" y="8" width="5" height="1" fill="#e52213" />
+                  <rect x="3" y="9" width="3" height="1" fill="#e52213" />
+                  <rect x="1" y="2" width="1" height="1" fill="#ff6060" />
+                  <rect x="6" y="2" width="1" height="1" fill="#ff6060" />
+                </svg>
+              ))}
+            </div>
+          </div>
 
           {/* ── State overlays ── */}
           <AnimatePresence>

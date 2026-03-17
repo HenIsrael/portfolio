@@ -22,13 +22,11 @@ function PixelFace() {
 }
 
 interface HeroProps {
-  selectedCharacter: string | null;
-  onOpenCharacterModal: () => void;
   gameMode: GameMode;
   onToggleMode: () => void;
 }
 
-export default function Hero({ selectedCharacter, onOpenCharacterModal, gameMode, onToggleMode }: HeroProps) {
+export default function Hero({ gameMode, onToggleMode }: HeroProps) {
   return (
     <motion.section
       className="flex flex-col items-center justify-center pt-3 pb-2 px-4 text-center"
@@ -157,27 +155,9 @@ export default function Hero({ selectedCharacter, onOpenCharacterModal, gameMode
         {/* Divider */}
         <div style={{ height: 3, background: "#c88000", margin: "1.5rem 0" }} />
 
-        {/* Mode toggle + character selector row */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+        {/* Mode toggle */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           <GameModeToggle mode={gameMode} onToggle={onToggleMode} />
-
-          {/* Character selector — secondary, below the mode toggle */}
-          <button
-            onClick={onOpenCharacterModal}
-            style={{
-              fontFamily:    '"Press Start 2P", monospace',
-              fontSize:      7,
-              color:         "#ffd700",
-              letterSpacing: "0.07em",
-              background:    "none",
-              border:        "none",
-              cursor:        "pointer",
-              padding:       0,
-              opacity:       0.8,
-            }}
-          >
-            ► {selectedCharacter ? selectedCharacter.toUpperCase() : "CHOOSE CHARACTER"} ◄
-          </button>
         </div>
       </div>
     </motion.section>

@@ -72,7 +72,8 @@ export function useGameEngine(
   worldKey: string,
   onWin: () => void,
 ) {
-  const [gameState, setGameState] = useState<GameState>("playing");
+  const [gameState,  setGameState]  = useState<GameState>("playing");
+  const [coinsLeft,  setCoinsLeft]  = useState<number>(0);
 
   /* stable refs — no stale closures inside the RAF loop */
   const levelRef   = useRef<LevelData>(LEVELS[worldKey] ?? LEVELS.mountain);
@@ -223,6 +224,7 @@ export function useGameEngine(
       coins.current = lv.coins.map(c => ({ ...c, collected: false }));
       statusRef.current  = "playing";
       setGameState("playing");
+      setCoinsLeft(lv.coins.filter(c => c.type !== "mushroom").length);
     };
 
     resetRef.current = initGame;
@@ -310,11 +312,16 @@ export function useGameEngine(
         /* coin collection */
         const cx = px.current + SW / 2;
         const cy = py.current + SH / 2;
+        let newlyCollected = false;
         for (const coin of coins.current) {
           if (coin.collected) continue;
           if (Math.hypot(cx - coin.x, cy - coin.y) < COIN_R + SW * 0.38) {
             coin.collected = true;
+            if (coin.type !== "mushroom") newlyCollected = true;
           }
+        }
+        if (newlyCollected) {
+          setCoinsLeft(coins.current.filter(c => !c.collected && c.type !== "mushroom").length);
         }
 
         /* death — fell off the bottom */
@@ -349,5 +356,5 @@ export function useGameEngine(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worldKey]);
 
-  return { gameState, resetGame: () => resetRef.current() };
+  return { gameState, coinsLeft, resetGame: () => resetRef.current() };
 }
