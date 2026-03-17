@@ -1,11 +1,34 @@
 import { motion } from "framer-motion";
+import GameModeToggle from "./GameModeToggle";
+import type { GameMode } from "./GameModeToggle";
+
+function PixelFace() {
+  return (
+    <img
+      src="/me.png"
+      alt="Hen Israel"
+      style={{
+        width: 120,
+        height: 120,
+        objectFit: "cover",
+        objectPosition: "top",
+        flexShrink: 0,
+        border: "3px solid #c88000",
+        boxShadow: "0 0 0 2px #5c2e00",
+        borderRadius: 4,
+      }}
+    />
+  );
+}
 
 interface HeroProps {
   selectedCharacter: string | null;
   onOpenCharacterModal: () => void;
+  gameMode: GameMode;
+  onToggleMode: () => void;
 }
 
-export default function Hero({ selectedCharacter, onOpenCharacterModal }: HeroProps) {
+export default function Hero({ selectedCharacter, onOpenCharacterModal, gameMode, onToggleMode }: HeroProps) {
   return (
     <motion.section
       className="flex flex-col items-center justify-center pt-3 pb-2 px-4 text-center"
@@ -20,7 +43,7 @@ export default function Hero({ selectedCharacter, onOpenCharacterModal }: HeroPr
           background: "rgba(0, 0, 0, 0.55)",
           border: "4px solid #c88000",
           boxShadow: "0 0 0 4px #5c2e00, 0 8px 32px rgba(0,0,0,0.5)",
-          padding: "2rem 2.5rem",
+          padding: "0.5rem 2.5rem",
           imageRendering: "pixelated",
           maxWidth: 480,
           width: "100%",
@@ -34,7 +57,7 @@ export default function Hero({ selectedCharacter, onOpenCharacterModal }: HeroPr
             alignItems: "flex-end",
             color: "#fff",
             fontSize: 10,
-            marginBottom: "1.5rem",
+            marginBottom: "0.5rem",
             letterSpacing: "0.05em",
             fontFamily: '"Press Start 2P", monospace',
           }}
@@ -100,68 +123,61 @@ export default function Hero({ selectedCharacter, onOpenCharacterModal }: HeroPr
         {/* Divider */}
         <div style={{ height: 3, background: "#c88000", marginBottom: "1.5rem" }} />
 
-        {/* Name */}
-        <h1
-          style={{
-            fontSize: "clamp(18px, 4vw, 28px)",
-            color: "#ffd700",
-            textShadow: "3px 3px 0 #5c2e00",
-            letterSpacing: "0.05em",
-            margin: 0,
-            lineHeight: 1.4,
-          }}
-        >
-          HEN ISRAEL
-        </h1>
-
-        {/* Role */}
-        <p
-          style={{
-            marginTop: "1rem",
-            fontSize: "clamp(8px, 1.8vw, 11px)",
-            color: "#52ff52",
-            letterSpacing: "0.08em",
-            lineHeight: 2,
-          }}
-        >
-          SOFTWARE DEVELOPER
-        </p>
+        {/* Name + portrait row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20 }}>
+          <PixelFace />
+          <div style={{ textAlign: "left" }}>
+            <h1
+              style={{
+                fontSize: "clamp(18px, 4vw, 28px)",
+                color: "#ffd700",
+                textShadow: "3px 3px 0 #5c2e00",
+                letterSpacing: "0.05em",
+                margin: 0,
+                lineHeight: 1.4,
+              }}
+            >
+              HEN ISRAEL
+            </h1>
+            <p
+              style={{
+                marginTop: "0.5rem",
+                marginBottom: 0,
+                fontSize: "clamp(8px, 1.8vw, 11px)",
+                color: "#52ff52",
+                letterSpacing: "0.08em",
+                lineHeight: 2,
+              }}
+            >
+              SOFTWARE DEVELOPER
+            </p>
+          </div>
+        </div>
 
         {/* Divider */}
         <div style={{ height: 3, background: "#c88000", margin: "1.5rem 0" }} />
 
-        {/* Press-start prompt / character button */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        {/* Mode toggle + character selector row */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+          <GameModeToggle mode={gameMode} onToggle={onToggleMode} />
+
+          {/* Character selector — secondary, below the mode toggle */}
           <button
             onClick={onOpenCharacterModal}
             style={{
-              fontFamily: '"Press Start 2P", monospace',
-              fontSize: 9,
-              color: "#fff",
-              letterSpacing: "0.1em",
-              animation: "marioBlink 1.1s step-end infinite",
-              margin: 0,
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: 0,
+              fontFamily:    '"Press Start 2P", monospace',
+              fontSize:      7,
+              color:         "#ffd700",
+              letterSpacing: "0.07em",
+              background:    "none",
+              border:        "none",
+              cursor:        "pointer",
+              padding:       0,
+              opacity:       0.8,
             }}
           >
-            ▼ CHOOSE YOUR CHARACTER ▼
+            ► {selectedCharacter ? selectedCharacter.toUpperCase() : "CHOOSE CHARACTER"} ◄
           </button>
-          {selectedCharacter && (
-            <span
-              style={{
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: 7,
-                color: "#ffd700",
-                letterSpacing: "0.05em",
-                whiteSpace: "nowrap",
-              }}
-            >
-              ► {selectedCharacter.toUpperCase()}
-            </span>
-          )}
         </div>
       </div>
     </motion.section>

@@ -4,7 +4,6 @@ import { HiDocumentText } from "react-icons/hi2";
 import { MdSecurity } from "react-icons/md";
 import LevelCard from "./LevelCard";
 import type { LevelCardProps } from "./LevelCard";
-
 interface CardGridProps {
   onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
 }

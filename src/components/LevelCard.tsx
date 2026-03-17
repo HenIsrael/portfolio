@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import type { IconType } from "react-icons";
-
 /* ──────────────────────────────────────────────────────────────
    Pixel-art scenes (80 × 52 SVG grid, image-rendering: pixelated)
 ────────────────────────────────────────────────────────────── */
@@ -345,7 +344,7 @@ export default function LevelCard({
   const [hovered,  setHovered]  = useState(false);
   const [descOpen, setDescOpen] = useState(false);
 
-  /* All card clicks now route through the game first */
+  /* Route through onGameStart — App decides play vs. view behaviour */
   const handleCardClick = () => {
     onGameStart(scene, href, isResume);
   };

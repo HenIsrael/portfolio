@@ -6,6 +6,7 @@ import ResumeModal from "./components/ResumeModal";
 import GameModal from "./components/GameModal";
 import CharacterModal from "./components/CharacterModal";
 import MarioBackground from "./components/MarioBackground";
+import type { GameMode } from "./components/GameModeToggle";
 
 type PendingWorld = {
   worldKey: string;
@@ -18,9 +19,15 @@ export default function App() {
   const [resumeOpen, setResumeOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const [characterModalOpen, setCharacterModalOpen] = useState(false);
+  const [gameMode, setGameMode] = useState<GameMode>("view");
   const [pendingWorld, setPendingWorld] = useState<PendingWorld | null>(null);
 
   const handleGameStart = (scene: string, href?: string, isResume?: boolean) => {
+    if (gameMode === "view") {
+      if (isResume) setResumeOpen(true);
+      else if (href) window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
     const titleMap: Record<string, string> = {
       mountain: "GitHub Repos",
       forest:   "Hugging Face",
@@ -49,6 +56,8 @@ export default function App() {
         <Hero
           selectedCharacter={selectedCharacter}
           onOpenCharacterModal={() => setCharacterModalOpen(true)}
+          gameMode={gameMode}
+          onToggleMode={() => setGameMode(m => m === "view" ? "play" : "view")}
         />
         <CardGrid onGameStart={handleGameStart} />
         <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
