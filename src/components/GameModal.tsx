@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
 import MarioSprite from "./characters/MarioSprite";
+import CookieMonsterSprite from "./characters/CookieMonsterSprite";
 
 interface GameModalProps {
   worldKey: string;
@@ -16,9 +17,9 @@ interface GameModalProps {
 const FONT = '"Press Start 2P", monospace';
 
 const CHARACTERS: { id: string; label: string; locked: boolean }[] = [
-  { id: "mario", label: "MARIO", locked: false },
-  { id: "???1",  label: "???",   locked: true  },
-  { id: "???2",  label: "???",   locked: true  },
+  { id: "mario",          label: "MARIO",   locked: false },
+  { id: "cookie-monster", label: "COOKIE MONSTER",  locked: false },
+  { id: "???2",           label: "???",     locked: true  },
 ];
 
 
@@ -28,7 +29,7 @@ export default function GameModal({
   onWin, onClose,
 }: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { gameState } = useGameEngine(canvasRef, worldKey, onWin);
+  const { gameState } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
 
   return (
     <motion.div
@@ -150,48 +151,78 @@ export default function GameModal({
                       display:        "flex",
                       flexDirection:  "column",
                       alignItems:     "center",
+                      justifyContent: "center",
                       gap:            3,
+                      width:          80,
+                      height:         80,
                       background:     isSelected ? "rgba(255,215,0,0.18)" : "rgba(0,0,0,0.5)",
                       border:         isSelected ? "2px solid #ffd700" : "2px solid #555",
                       boxShadow:      isSelected ? "0 0 0 2px #c88000, 0 0 14px rgba(255,215,0,0.4)" : "none",
-                      padding:        "4px 8px",
+                      padding:        "4px 0",
                       cursor:         char.locked ? "not-allowed" : "pointer",
                       opacity:        char.locked ? 0.3 : 1,
                       transition:     "border 0.15s, box-shadow 0.15s, background 0.15s",
                       outline:        "none",
                       imageRendering: "pixelated",
                       fontFamily:     FONT,
+                      flexShrink:     0,
                     }}
                   >
-                    {char.locked ? (
-                      <span style={{ width: 32, height: 32, display: "flex", alignItems: "center", justifyContent: "center", filter: "grayscale(1)", fontSize: 18 }}>
-                        🔒
-                      </span>
-                    ) : (
-                      <MarioSprite size={32} />
-                    )}
-                    <span style={{ fontSize: 6, color: isSelected ? "#ffd700" : "#666", letterSpacing: "0.05em" }}>
-                      {char.label}
+                    <div style={{ width: 32, height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {char.locked ? (
+                        <span style={{ filter: "grayscale(1)", fontSize: 18 }}>🔒</span>
+                      ) : char.id === "cookie-monster" ? (
+                        <CookieMonsterSprite size={32} />
+                      ) : (
+                        <MarioSprite size={32} />
+                      )}
+                    </div>
+                    <span
+                      style={{
+                        fontSize:    6,
+                        color:       isSelected ? "#ffd700" : "#666",
+                        letterSpacing: "0.05em",
+                        textAlign:   "center",
+                        lineHeight:  1.4,
+                        height:      16,
+                        overflow:    "hidden",
+                        display:     "flex",
+                        flexDirection: "column",
+                        alignItems:  "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {char.label.split(" ").map((word, i) => (
+                        <div key={i}>{word}</div>
+                      ))}
                     </span>
                   </button>
                 );
               })}
             </div>
 
-            {/* 3 pixel-art hearts — below the whole characters row */}
+            {/* 3 smooth SVG hearts */}
             <div style={{ display: "flex", gap: 10 }}>
               {[0, 1, 2].map((i) => (
-                <svg key={i} width="16" height="16" viewBox="0 0 10 10" style={{ imageRendering: "pixelated" }}>
-                  <rect x="1" y="2" width="3" height="1" fill="#e52213" />
-                  <rect x="6" y="2" width="3" height="1" fill="#e52213" />
-                  <rect x="0" y="3" width="4" height="2" fill="#e52213" />
-                  <rect x="5" y="3" width="4" height="2" fill="#e52213" />
-                  <rect x="0" y="5" width="9" height="2" fill="#e52213" />
-                  <rect x="1" y="7" width="7" height="1" fill="#e52213" />
-                  <rect x="2" y="8" width="5" height="1" fill="#e52213" />
-                  <rect x="3" y="9" width="3" height="1" fill="#e52213" />
-                  <rect x="1" y="2" width="1" height="1" fill="#ff6060" />
-                  <rect x="6" y="2" width="1" height="1" fill="#ff6060" />
+                <svg
+                  key={i}
+                  viewBox="-11 -11 122 111"
+                  width="18"
+                  height="18"
+                  style={{
+                    display: "block",
+                  }}
+                >
+                  <path
+                    d="
+                      M 50 0
+                      A 1 1 0 1 0 0 50
+                      L 50 100
+                      L 100 50
+                      A 1 1 0 1 0 50 0
+                    "
+                    fill="#ef3232"
+                  />
                 </svg>
               ))}
             </div>
