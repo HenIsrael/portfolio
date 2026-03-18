@@ -22,6 +22,32 @@ const CHARACTERS: { id: string; label: string; locked: boolean }[] = [
   { id: "???2",           label: "???",     locked: true  },
 ];
 
+function Heart({ size = 32 }: { size?: number }) {
+  const color = "#e52213";
+
+  const pixels = [
+    [4,1],[5,1],[6,1],[9,1],[10,1],[11,1],
+    [3,2],[4,2],[5,2],[6,2],[7,2],[8,2],[9,2],[10,2],[11,2],[12,2],
+    [3,3],[4,3],[5,3],[6,3],[7,3],[8,3],[9,3],[10,3],[11,3],[12,3],
+    [4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],[11,4],
+    [5,5],[6,5],[7,5],[8,5],[9,5],[10,5],
+    [6,6],[7,6],[8,6],[9,6],
+    [7,7],[8,7],
+  ];
+
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width={size}
+      height={size}
+      style={{ imageRendering: "pixelated" }}
+    >
+      {pixels.map(([x, y], i) => (
+        <rect key={i} x={x} y={y} width={1} height={1} fill={color} />
+      ))}
+    </svg>
+  );
+}
 
 export default function GameModal({
   worldKey, worldTitle,
@@ -155,7 +181,7 @@ export default function GameModal({
                       gap:            3,
                       width:          80,
                       height:         80,
-                      background:     isSelected ? "rgba(255,215,0,0.18)" : "rgba(0,0,0,0.5)",
+                      background:     isSelected ? "rgba(255,215,0,0.15)" : "transparent",
                       border:         isSelected ? "2px solid #ffd700" : "2px solid #555",
                       boxShadow:      isSelected ? "0 0 0 2px #c88000, 0 0 14px rgba(255,215,0,0.4)" : "none",
                       padding:        "4px 0",
@@ -202,28 +228,9 @@ export default function GameModal({
             </div>
 
             {/* 3 smooth SVG hearts */}
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", gap: 8 }}>
               {[0, 1, 2].map((i) => (
-                <svg
-                  key={i}
-                  viewBox="-11 -11 122 111"
-                  width="18"
-                  height="18"
-                  style={{
-                    display: "block",
-                  }}
-                >
-                  <path
-                    d="
-                      M 50 0
-                      A 1 1 0 1 0 0 50
-                      L 50 100
-                      L 100 50
-                      A 1 1 0 1 0 50 0
-                    "
-                    fill="#ef3232"
-                  />
-                </svg>
+                <Heart key={i} />
               ))}
             </div>
           </div>
