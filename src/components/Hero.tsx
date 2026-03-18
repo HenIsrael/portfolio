@@ -5,7 +5,7 @@ import type { GameMode } from "./GameModeToggle";
 function PixelFace() {
   return (
     <img
-      src="/me.png"
+      src="/profile.png"
       alt="Hen Israel"
       style={{
         width: 120,
