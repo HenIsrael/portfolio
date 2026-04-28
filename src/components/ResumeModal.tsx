@@ -4,7 +4,7 @@ import {
   SiReact, SiNodedotjs, SiDocker, SiGit, SiRender, SiVercel, SiJira,
   SiFastapi,
 } from "react-icons/si";
-import { FaScroll, FaGraduationCap, FaCode, FaShieldAlt, FaStar, FaExternalLinkAlt } from "react-icons/fa";
+import { FaScroll, FaGraduationCap, FaCode, FaShieldAlt, FaStar, FaExternalLinkAlt, FaFilePdf } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 
 interface ResumeModalProps {
@@ -150,22 +150,41 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               <span style={{ fontFamily: FONT, fontSize: 9, color: GREEN, letterSpacing: "0.08em" }}>
                 ★ PLAYER PROFILE
               </span>
-              <button
-                onClick={onClose}
-                aria-label="Close resume"
-                style={{
-                  fontFamily: FONT, fontSize: 10, color: "#fff",
-                  background: "rgba(92,46,0,0.7)",
-                  border: `2px solid ${GOLD}`,
-                  padding: "4px 8px", cursor: "pointer",
-                  lineHeight: 1,
-                  boxShadow: "2px 2px 0 rgba(0,0,0,0.5)",
-                  display: "flex", alignItems: "center", gap: 4,
-                }}
-              >
-                <IoClose size={14} />
-                <span style={{ fontSize: 8 }}>ESC</span>
-              </button>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <a
+                  href="/cv.pdf"
+                  download="hen_israel_cv.pdf"
+                  aria-label="Download resume as PDF"
+                  style={{
+                    fontFamily: FONT, fontSize: 10, color: "#fff",
+                    background: "#cc1a1a",
+                    border: "2px solid #ff4444",
+                    padding: "4px 8px", cursor: "pointer",
+                    lineHeight: 1, textDecoration: "none",
+                    boxShadow: "2px 2px 0 rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", gap: 4,
+                  }}
+                >
+                  <FaFilePdf size={13} color="#fff" />
+                  <span style={{ fontSize: 8 }}>PDF</span>
+                </a>
+                <button
+                  onClick={onClose}
+                  aria-label="Close resume"
+                  style={{
+                    fontFamily: FONT, fontSize: 10, color: "#fff",
+                    background: "rgba(92,46,0,0.7)",
+                    border: `2px solid ${GOLD}`,
+                    padding: "4px 8px", cursor: "pointer",
+                    lineHeight: 1,
+                    boxShadow: "2px 2px 0 rgba(0,0,0,0.5)",
+                    display: "flex", alignItems: "center", gap: 4,
+                  }}
+                >
+                  <IoClose size={14} />
+                  <span style={{ fontSize: 8 }}>ESC</span>
+                </button>
+              </div>
             </div>
 
             {/* Divider */}
