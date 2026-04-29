@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import Hero from "./components/Hero";
 import CardGrid from "./components/CardGrid";
 import ResumeModal from "./components/ResumeModal";
+import BioModal from "./components/BioModal";
 import GameModal from "./components/GameModal";
 import MarioBackground from "./components/MarioBackground";
+import RotatePrompt from "./components/RotatePrompt";
 import type { GameMode } from "./components/GameModeToggle";
 
 type PendingWorld = {
@@ -14,11 +16,35 @@ type PendingWorld = {
   isResume?: boolean;
 };
 
+/**
+ * Computes a zoom factor so the whole page fits within the visible viewport.
+ * The page was designed for ~950 px of usable height (1080 p minus browser chrome).
+ * Shrinks proportionally on laptops / smaller monitors; never scales above 1.
+ */
+function useViewportZoom(designHeight = 950, minZoom = 0.65): number {
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    const update = () => {
+      const z = Math.min(1, window.innerHeight / designHeight);
+      setZoom(Math.max(minZoom, z));
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, [designHeight, minZoom]);
+
+  return zoom;
+}
+
 export default function App() {
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [bioOpen, setBioOpen] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<string>("mario");
   const [gameMode, setGameMode] = useState<GameMode>("view");
   const [pendingWorld, setPendingWorld] = useState<PendingWorld | null>(null);
+
+  const zoom = useViewportZoom();
 
   const handleGameStart = (scene: string, href?: string, isResume?: boolean) => {
     if (gameMode === "view") {
@@ -49,14 +75,16 @@ export default function App() {
 
   return (
     <>
+      <RotatePrompt />
       <MarioBackground />
-      <main className="min-h-screen" style={{ paddingBottom: 8 }}>
+      <main className="min-h-screen" style={{ paddingBottom: 8, zoom }}>
         <Hero
           gameMode={gameMode}
           onToggleMode={() => setGameMode(m => m === "view" ? "play" : "view")}
         />
-        <CardGrid onGameStart={handleGameStart} />
+        <CardGrid onGameStart={handleGameStart} onLakeClick={() => setBioOpen(true)} />
         <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
+        <BioModal isOpen={bioOpen} onClose={() => setBioOpen(false)} />
       </main>
 
       <AnimatePresence>

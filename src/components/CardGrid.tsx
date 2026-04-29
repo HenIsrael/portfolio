@@ -3,9 +3,11 @@ import { SiHuggingface } from "react-icons/si";
 import { HiDocumentText } from "react-icons/hi2";
 import { MdSecurity } from "react-icons/md";
 import LevelCard from "./LevelCard";
+import LakeCenter from "./LakeCenter";
 import type { LevelCardProps } from "./LevelCard";
 interface CardGridProps {
   onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
+  onLakeClick: () => void;
 }
 
 type CardData = Omit<LevelCardProps, "index" | "onGameStart"> & {
@@ -47,35 +49,58 @@ const cards: CardData[] = [
   },
 ];
 
-const DIAMOND_POSITIONS: { card: CardData; col: number; row: number }[] = [
-  { card: cards[2], col: 2, row: 1 }, // Resume     — top center
-  { card: cards[0], col: 1, row: 2 }, // GitHub     — middle left
-  { card: cards[1], col: 3, row: 2 }, // Hugging Face — middle right
-  { card: cards[3], col: 2, row: 3 }, // SafrSight  — bottom center
+/* ── 5×5 grid positions ────────────────────────────────────────
+   Columns: 1   2   3   4   5
+            └── └── └── └── └──
+   Rows:    1 = top, 3 = middle, 5 = bottom
+   Lake sits at the true center: col 3, row 3.
+
+   To nudge ONE card without affecting others use offsetX / offsetY.
+   These use position:relative so they NEVER push other cards around.
+   • offsetY:  negative = move ↑   positive = move ↓
+   • offsetX:  positive = move →   negative = move ←
+────────────────────────────────────────────────────────────── */
+type PositionSlot = {
+  card: CardData;
+  col: number;
+  row: number;
+  offsetX?: number; // px, relative — does NOT affect other cards
+  offsetY?: number; // px, relative — does NOT affect other cards
+};
+
+const POSITIONS: PositionSlot[] = [
+  { card: cards[2], col: 3, row: 1 , offsetY: 40, offsetX: 62},                    // Resume
+  { card: cards[0], col: 1, row: 3, offsetY: -82, offsetX: 50 }, // GitHub
+  { card: cards[1], col: 3, row: 5, offsetY: -60, offsetX: -100 },                    // Hugging Face — bottom center
+  { card: cards[3], col: 5, row: 3 },                    // SafrSight — middle right
 ];
 
-export default function CardGrid({ onGameStart }: CardGridProps) {
+export default function CardGrid({ onGameStart, onLakeClick }: CardGridProps) {
   return (
-    <section className="mx-auto w-full max-w-3xl px-4 pb-2">
+    <section className="mx-auto -mt-10 w-full max-w-4xl px-4 pb-2">
       <div
         style={{
           display:             "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gridTemplateRows:    "auto auto auto",
+          gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
+          gridTemplateRows:    "auto auto auto auto auto",
           rowGap:              "0px",
           columnGap:           "0px",
-          paddingTop:          "0px"
         }}
       >
-        {DIAMOND_POSITIONS.map(({ card, col, row }, i) => (
+        {POSITIONS.map(({ card, col, row, offsetX, offsetY }, i) => (
           <div
             key={card.title}
-            style={{ 
-              gridColumn: col, 
-              gridRow: row,
-              marginBottom: row === 1 ? "-100px" : undefined, // pull top card down
-              marginTop: row === 3 ? "-100px" : undefined,    // pull bottom card up
-             }}
+            style={{
+              gridColumn:      col,
+              gridRow:         row,
+              display:         "flex",
+              justifyContent:  "center",
+              position:        "relative",
+              left:            offsetX ?? 0,
+              top:             offsetY ?? 0,
+              /* Above the lake so footer / ? block stays clickable when offsets overlap the lake */
+              zIndex:          2,
+            }}
           >
             <LevelCard
               index={i}
@@ -90,6 +115,21 @@ export default function CardGrid({ onGameStart }: CardGridProps) {
             />
           </div>
         ))}
+
+        {/* Lake — z-index below level cards so offset overlaps don't steal clicks */}
+        <div
+          style={{
+            gridColumn:     3,
+            gridRow:        3,
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            position:       "relative",
+            zIndex:         0,
+          }}
+        >
+          <LakeCenter onClick={onLakeClick} />
+        </div>
       </div>
     </section>
   );
