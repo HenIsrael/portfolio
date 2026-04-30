@@ -137,7 +137,7 @@ export default function ResumeModal({ isOpen, onClose }: ResumeModalProps) {
               width: "clamp(320px, 95vw, 1200px)",
               maxHeight: "calc(100vh - 40px)",
               overflowY: "auto",
-              background: "rgba(10, 8, 20, 0.97)",
+              background: "#0d1a2b",
               border:     `4px solid ${GOLD}`,
               boxShadow:  `0 0 0 4px ${GOLD2}, 0 12px 60px ${GOLD}55, inset 0 0 60px rgba(200,128,0,0.04)`,
               padding:    "2rem 2rem 2.5rem",
