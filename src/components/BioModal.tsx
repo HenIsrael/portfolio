@@ -1,5 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { FaEnvelope, FaLinkedin, FaGithub, FaMapMarkerAlt } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaLinkedin,
+  FaMapMarkerAlt,
+  FaGraduationCap,
+  FaBriefcase,
+  FaPhone,
+} from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 
 interface BioModalProps {
@@ -101,12 +108,11 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
             <div style={{ height: 3, background: `linear-gradient(to right, transparent, ${GOLD}, transparent)`, marginBottom: 24 }} />
 
             {/* Profile row */}
-            <div style={{ display: "flex", gap: 22, alignItems: "flex-start", marginBottom: 28 }}>
+            <div style={{ display: "flex", gap: 22, alignItems: "stretch", marginBottom: 28 }}>
               <div
                 style={{
                   flexShrink: 0,
-                  width: 96,
-                  height: 96,
+                  width: 110,
                   border: `3px solid ${GOLD}`,
                   boxShadow: `0 0 0 2px ${GOLD2}, 0 0 20px ${GOLD}44`,
                   overflow: "hidden",
@@ -116,7 +122,7 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 <img
                   src="/profile.png"
                   alt="Hen Israel"
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).style.display = "none";
                   }}
@@ -136,7 +142,7 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                     textShadow: `0 0 20px ${GOLD}88, 2px 2px 0 rgba(0,0,0,0.8)`,
                   }}
                 >
-                  HEN ISRAEL
+                  HEN ORI ISRAEL
                 </h2>
                 <p
                   style={{
@@ -156,8 +162,8 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                   {[
                     {
                       icon: FaEnvelope,
-                      label: "hen.israel1@gmail.com",
-                      href: "mailto:hen.israel1@gmail.com",
+                      label: "hheenn20@gmail.com",
+                      href: "mailto:hheenn20@gmail.com",
                     },
                     {
                       icon: FaLinkedin,
@@ -165,14 +171,9 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                       href: "https://www.linkedin.com/in/hen-israel/",
                     },
                     {
-                      icon: FaGithub,
-                      label: "github.com/HenIsrael",
-                      href: "https://github.com/HenIsrael",
-                    },
-                    {
-                      icon: FaMapMarkerAlt,
-                      label: "Israel",
-                      href: undefined,
+                      icon: FaPhone,
+                      label: "+972 526399508",
+                      href: "tel:+972526399508",
                     },
                   ].map(({ icon: Icon, label, href }) =>
                     href ? (
@@ -225,21 +226,53 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 borderLeft: `3px solid ${GOLD}`,
               }}
             >
-              <p
-                style={{
-                  fontFamily: "'Raleway', sans-serif",
-                  fontSize: 15,
-                  fontWeight: 300,
-                  color: "#b8c8d8",
-                  lineHeight: 1.7,
-                  margin: 0,
-                }}
-              >
-                Junior Software Engineer with a B.Sc. in Computer Science from the Technion and 2 years of
-                experience as a Computer Vision Engineer Intern at Rafael. Proven ability to learn new
-                technologies quickly, take ownership of systems, and work effectively in complex,
-                multi-team environments.
-              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                {/* Intro */}
+                <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: 14, fontWeight: 300, color: "#b8c8d8", lineHeight: 1.75, margin: 0 }}>
+                <span style={{ textShadow: `0 0 20px ${GOLD}88, 2px 2px 0 rgba(0,0,0,0.8)`, fontWeight: 800 }}>Welcome to my world!</span> Much like a classic platformer, my journey in tech has been about leveling up, unlocking new abilities, and navigating complex landscapes. I hold a B.Sc. in Computer Science from the <span style={{ color: CYAN, fontWeight: 600 }}>Technion</span>, where I built the foundation for my "power-ups" in engineering and problem-solving.
+                </p>
+
+                {/* Section: Quest Logs */}
+                <div>
+                  <div style={{ fontFamily: FONT, fontSize: 7, color: GOLD, letterSpacing: "0.1em", marginBottom: 6 }}>
+                    THE QUEST LOGS
+                  </div>
+                  <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: 14, fontWeight: 300, color: "#b8c8d8", lineHeight: 1.75, margin: 0 }}>
+                    My journey took me to <span style={{ color: CYAN, fontWeight: 600 }}>Rafael</span>, where I spent two years in the Computer Vision department. As part of the <span style={{ color: "#b8c8d8", fontWeight: 500 }}>Data Platform team</span>, I developed systems for efficiently uploading and retrieving field experiment data through precise, queryable pipelines. Along the way, I also contributed to a <span style={{ color: "#b8c8d8", fontWeight: 500 }}>Navigation Trajectory model</span>, tracking down path inconsistencies to ensure accurate and reliable system behavior.
+                  </p>
+                </div>
+
+                {/* Section: Big Boss Battle */}
+                <div>
+                  <div style={{ fontFamily: FONT, fontSize: 7, color: GOLD, letterSpacing: "0.1em", marginBottom: 6 }}>
+                    THE BIG BOSS BATTLE
+                  </div>
+                  <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: 14, fontWeight: 300, color: "#b8c8d8", lineHeight: 1.75, margin: 0 }}>
+                    For my final quest at school, I stepped into the world of <span style={{ color: GREEN, fontWeight: 600 }}>Deep Learning</span>, building a model designed to detect violent behavior within video feeds. To bring this to life, I went full <span style={{ color: GREEN, fontWeight: 600 }}>Fullstack mode</span>, creating a web application that allows users to upload real videos and receive instant predictions. It's not just about the code; it's about building tools that make a real-world impact.
+                  </p>
+                </div>
+
+                {/* Section: Inventory & Skills */}
+                <div>
+                  <div style={{ fontFamily: FONT, fontSize: 7, color: GOLD, letterSpacing: "0.1em", marginBottom: 6 }}>
+                    INVENTORY & SKILLS
+                  </div>
+                  <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: 14, fontWeight: 300, color: "#b8c8d8", lineHeight: 1.75, margin: 0 }}>
+                    My loadout centers around <span style={{ fontWeight: 800 }}>Computer Vision</span>, <span style={{ fontWeight: 800 }}>Fullstack Development</span>, and <span style={{ fontWeight: 800 }}>DevOps</span> — fields where I've gained hands-on experience and am continuously leveling up. I'm constantly grinding XP by learning new tools and improving existing ones, and I thrive in co-op mode — working with strong teams to tackle complex challenges and ship meaningful solutions.
+                  </p>
+                </div>
+
+                {/* Section: Current Status */}
+                <div style={{ background: "rgba(82,255,82,0.06)", border: "1px solid rgba(82,255,82,0.25)", borderLeft: `3px solid ${GREEN}`, padding: "10px 14px" }}>
+                  <div style={{ fontFamily: FONT, fontSize: 7, color: GREEN, letterSpacing: "0.1em", marginBottom: 6 }}>
+                    CURRENT STATUS
+                  </div>
+                  <p style={{ fontFamily: "'Raleway', sans-serif", fontSize: 14, fontWeight: 400, color: "#b8c8d8", lineHeight: 1.75, margin: 0 }}>
+                    <span style={{ color: GREEN }}>🟢 Open for a new quest.</span><br />
+                    Ready to dive into the next challenge, grow as an engineer, and build impactful solutions with a great team.
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Stats — SkillChip-style like ResumeModal */}
@@ -251,10 +284,10 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
               }}
             >
               {[
-                { label: "DEGREE", value: "B.Sc CS" },
-                { label: "EXPERIENCE", value: "2 YRS" },
-                { label: "LOCATION", value: "ISRAEL" },
-              ].map(({ label, value }) => (
+                { label: "DEGREE", value: "B.Sc CS", Icon: FaGraduationCap },
+                { label: "EXPERIENCE", value: "2 YRS", Icon: FaBriefcase },
+                { label: "LOCATION", value: "ISRAEL", Icon: FaMapMarkerAlt },
+              ].map(({ label, value, Icon }) => (
                 <div
                   key={label}
                   style={{
@@ -267,6 +300,10 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                 >
                   <div
                     style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 4,
                       fontFamily: FONT,
                       fontSize: 6,
                       color: "#6070a0",
@@ -274,6 +311,7 @@ export default function BioModal({ isOpen, onClose }: BioModalProps) {
                       letterSpacing: "0.08em",
                     }}
                   >
+                    <Icon size={12} style={{ flexShrink: 0, marginBottom: 2 }} />
                     {label}
                   </div>
                   <div style={{ fontFamily: FONT, fontSize: 8, color: GOLD }}>{value}</div>
