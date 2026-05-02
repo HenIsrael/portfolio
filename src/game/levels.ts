@@ -9,7 +9,8 @@ export interface Platform {
 export interface Coin {
   x: number;
   y: number;
-  type?: "coin" | "mushroom";
+  skill: string;
+  icon: string;
 }
 
 export interface LevelData {
@@ -18,7 +19,7 @@ export interface LevelData {
   groundColor: string;
   platformColor: string;
   platformBorderColor: string;
-  coinColor: string;
+  skillColor: string;
   platforms: Platform[];
   coins: Coin[];
   playerStart: { x: number; y: number };
@@ -32,7 +33,7 @@ export const LEVELS: Record<string, LevelData> = {
     groundColor: "#c0d8ee",
     platformColor: "#c0d8ee",
     platformBorderColor: "#8ab0cc",
-    coinColor: "#ffd700",
+    skillColor: "#3fb950",
     worldId: "WORLD 1-1",
     platforms: [
       { x: 0,   y: 380, w: 800, h: 70 }, // snowy ground
@@ -41,11 +42,11 @@ export const LEVELS: Record<string, LevelData> = {
       { x: 530, y: 185, w: 150, h: 16 },
     ],
     coins: [
-      { x: 130, y: 268 },
-      { x: 180, y: 268 },
-      { x: 365, y: 212 },
-      { x: 570, y: 152 },
-      { x: 630, y: 152 },
+      { x: 130, y: 268, skill: "Git Bash",   icon: "/skills/gitBash.jpg"   },
+      { x: 195, y: 268, skill: "Python",      icon: "/skills/python.png"    },
+      { x: 385, y: 213, skill: "TypeScript",  icon: "/skills/ts.png"        },
+      { x: 570, y: 152, skill: "HTML",        icon: "/skills/html.png"      },
+      { x: 635, y: 152, skill: "CSS",         icon: "/skills/css.png"       },
     ],
     playerStart: { x: 50, y: 330 },
   },
@@ -56,7 +57,7 @@ export const LEVELS: Record<string, LevelData> = {
     groundColor: "#52a800",
     platformColor: "#6b3800",
     platformBorderColor: "#3a1800",
-    coinColor: "#ffd700",
+    skillColor: "#ff9d00",
     worldId: "WORLD 2-1",
     platforms: [
       { x: 0,   y: 380, w: 800, h: 70 }, // grass ground
@@ -68,14 +69,10 @@ export const LEVELS: Record<string, LevelData> = {
       { x: 572, y: 298, w: 40, h: 18, color: "#388e3c" },
     ],
     coins: [
-      { x: 100, y: 260 },
-      { x: 305, y: 205 },
-      { x: 360, y: 205 },
-      { x: 520, y: 250 },
-      { x: 700, y: 175 },
-      // mushroom collectibles — sitting on the ground
-      { x: 196, y: 369, type: "mushroom" }, // between stair 1 and pipe 1
-      { x: 486, y: 369, type: "mushroom" }, // between stair 2 and pipe 2
+      { x: 120, y: 263, skill: "OpenCV",          icon: "/skills/openCV.png"      },
+      { x: 330, y: 208, skill: "TensorFlow",       icon: "/skills/tensorFlow.png"  },
+      { x: 592, y: 266, skill: "PyTorch",          icon: "/skills/pyTorch.png"     },
+      { x: 715, y: 178, skill: "Neural Networks",  icon: "/skills/dp.png"          },
     ],
     playerStart: { x: 50, y: 330 },
   },
@@ -85,7 +82,7 @@ export const LEVELS: Record<string, LevelData> = {
     groundColor: "#585868",
     platformColor: "#585868",
     platformBorderColor: "#3a3a4c",
-    coinColor: "#f0c030",
+    skillColor: "#7c8cf8",
     worldId: "WORLD 3-4",
     platforms: [
       { x: 0,   y: 380, w: 800, h: 70 }, // stone ground
@@ -95,11 +92,11 @@ export const LEVELS: Record<string, LevelData> = {
       { x: 660, y: 300, w: 120, h: 18 },
     ],
     coins: [
-      { x: 100, y: 280 },
-      { x: 310, y: 225 },
-      { x: 370, y: 225 },
-      { x: 525, y: 165 },
-      { x: 700, y: 265 },
+      { x: 100, y: 280, skill: "Python",           icon: "/skills/python.png"   },
+      { x: 310, y: 225, skill: "C++",              icon: "/skills/cpp.png"      },
+      { x: 375, y: 225, skill: "Computer Vision",  icon: "/skills/cv.png"   },
+      { x: 525, y: 165, skill: "Docker",           icon: "/skills/docker.png"   },
+      { x: 710, y: 265, skill: "Git",              icon: "/skills/git.png"      },
     ],
     playerStart: { x: 50, y: 330 },
   },
@@ -110,7 +107,7 @@ export const LEVELS: Record<string, LevelData> = {
     groundColor: "#c0a840",
     platformColor: "#ece4c0",
     platformBorderColor: "#c8c0a0",
-    coinColor: "#ffd700",
+    skillColor: "#0ea5e9",
     worldId: "WORLD 4-1",
     platforms: [
       { x: 0,   y: 380, w: 800, h: 70 }, // marble ground
@@ -120,11 +117,11 @@ export const LEVELS: Record<string, LevelData> = {
       { x: 660, y: 285, w: 100, h: 18 },
     ],
     coins: [
-      { x: 118, y: 270 },
-      { x: 318, y: 215 },
-      { x: 500, y: 160 },
-      { x: 520, y: 160 },
-      { x: 698, y: 250 },
+      { x: 118, y: 270, skill: "REST API",      icon: "/skills/fastAPI.png"  },
+      { x: 318, y: 215, skill: "React",          icon: "/skills/react.png"    },
+      { x: 500, y: 160, skill: "Vercel",         icon: "/skills/vercel.png"   },
+      { x: 540, y: 160, skill: "Render",         icon: "/skills/render.jpg"   },
+      { x: 700, y: 250, skill: "Deep Learning",  icon: "/skills/dp.png"       },
     ],
     playerStart: { x: 50, y: 330 },
   },

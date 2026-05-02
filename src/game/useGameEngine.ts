@@ -23,7 +23,7 @@ const GRAVITY   = 0.55;
 const MAX_FALL  = 14;
 const JUMP_VY   = -12;
 const WALK_SPD  = 4;
-const COIN_R    = 9;
+const COIN_R    = 9;   // collection radius (kept for hit-test)
 
 export type GameState = "playing" | "dead" | "won";
 
@@ -120,7 +120,9 @@ export function useGameEngine(
   const pvy        = useRef(0);
   const onGround   = useRef(false);
   const facingLeft = useRef(false);
-  const coins      = useRef<{ x: number; y: number; collected: boolean; type?: "coin" | "mushroom" }[]>([]);
+  const coins      = useRef<{ x: number; y: number; collected: boolean; skill: string; icon: string }[]>([]);
+  const imgCache   = useRef<Map<string, HTMLImageElement>>(new Map());
+  const tooltip    = useRef<{ skill: string; x: number; y: number } | null>(null);
   const frameNum   = useRef(0);
   const rafId      = useRef(0);
   const onWinRef   = useRef(onWin);
@@ -129,33 +131,49 @@ export function useGameEngine(
 
   useEffect(() => { onWinRef.current = onWin; }, [onWin]);
 
-  /* pixel-art Mario mushroom centered at (cx, cy) */
-  function drawMushroom(ctx: CanvasRenderingContext2D, cx: number, cy: number) {
-    /* stem */
-    ctx.fillStyle = "#f0ecdc";
-    ctx.fillRect(cx - 4, cy + 2,  8, 9);
-    ctx.fillStyle = "#d8d0b8";           // left shadow strip
-    ctx.fillRect(cx - 4, cy + 2,  2, 9);
+  /* floating skill icon centered at (cx, cy) */
+  function drawSkillIcon(
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    icon: string,
+    color: string,
+    frame: number,
+  ) {
+    const img = imgCache.current.get(icon);
+    if (!img?.complete || img.naturalWidth === 0) return;
 
-    /* cap underside fringe */
-    ctx.fillStyle = "#f0ecdc";
-    ctx.fillRect(cx - 10, cy + 2, 20, 3);
+    ctx.save();
+    const RADIUS    = 18;
+    const ICON_SIZE = 28;
+    const bob = Math.sin(frame * 0.055 + cx * 0.01) * 3;
+    const drawY = cy + bob;
 
-    /* cap — 3 rows, widening toward bottom */
-    ctx.fillStyle = "#cc1010";
-    ctx.fillRect(cx - 5,  cy - 12, 10, 6);   // top (narrow)
-    ctx.fillRect(cx - 8,  cy - 7,  16, 6);   // middle
-    ctx.fillRect(cx - 10, cy - 2,  20, 6);   // widest (base)
+    /* glow */
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = 12;
 
-    /* cap highlight — thin bright strip along top edge */
-    ctx.fillStyle = "#e83030";
-    ctx.fillRect(cx - 4, cy - 12, 8, 2);
+    /* dark circular background */
+    ctx.fillStyle = "rgba(0,0,0,0.72)";
+    ctx.beginPath();
+    ctx.arc(cx, drawY, RADIUS, 0, Math.PI * 2);
+    ctx.fill();
 
-    /* white dots */
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(cx - 7, cy - 5,  3, 3);   // left dot
-    ctx.fillRect(cx + 4, cy - 5,  3, 3);   // right dot
-    ctx.fillRect(cx - 1, cy - 10, 3, 3);   // top centre dot
+    /* colored border */
+    ctx.shadowBlur  = 0;
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = 2;
+    ctx.beginPath();
+    ctx.arc(cx, drawY, RADIUS, 0, Math.PI * 2);
+    ctx.stroke();
+
+    /* clip icon to circle */
+    ctx.beginPath();
+    ctx.arc(cx, drawY, RADIUS - 2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(img, cx - ICON_SIZE / 2, drawY - ICON_SIZE / 2, ICON_SIZE, ICON_SIZE);
+
+    ctx.restore();
   }
 
   /* render — reads live ref values, defined at hook scope so all refs are in closure */
@@ -187,27 +205,64 @@ export function useGameEngine(
       ctx.fillRect(p.x, p.y + p.h - 3, p.w, 3);
     }
 
-    /* coins + mushrooms */
+    /* skill icons */
     for (const coin of coins.current) {
       if (coin.collected) continue;
-      if (coin.type === "mushroom") {
-        /* gentle bob */
-        const bob = Math.sin(frame * 0.055 + coin.x * 0.01) * 2;
-        drawMushroom(ctx, coin.x, coin.y + bob);
+      drawSkillIcon(ctx, coin.x, coin.y, coin.icon, lv.skillColor, frame);
+    }
+
+    /* skill name tooltip (shown when player clicks an icon) */
+    if (tooltip.current) {
+      const t = tooltip.current;
+      const stillActive = coins.current.some(c => c.skill === t.skill && !c.collected);
+      if (!stillActive) {
+        tooltip.current = null;
       } else {
-        /* spinning coin — horizontal scale oscillation */
-        const sx = Math.max(0.12, Math.abs(Math.sin(frame * 0.07 + coin.x * 0.008)));
+        const RADIUS   = 18;
+        const fontSize = t.skill.length > 10 ? 6 : 7;
         ctx.save();
-        ctx.translate(coin.x, coin.y);
-        ctx.scale(sx, 1);
+        ctx.font = `${fontSize}px "Press Start 2P", monospace`;
+        const textW = ctx.measureText(t.skill).width;
+        const padX  = 8;
+        const padY  = 5;
+        const bw    = textW + padX * 2;
+        const bh    = fontSize + padY * 2;
+        const bob   = Math.sin(frame * 0.055 + t.x * 0.01) * 3;
+        /* clamp so tooltip never clips off the canvas edges */
+        const bx    = Math.max(4, Math.min(CANVAS_W - bw - 4, t.x - bw / 2));
+        const by    = t.y - RADIUS - 8 - bh + bob;
+
+        /* background */
+        ctx.shadowColor = lv.skillColor;
+        ctx.shadowBlur  = 8;
+        ctx.fillStyle   = "rgba(0,0,0,0.88)";
         ctx.beginPath();
-        ctx.arc(0, 0, COIN_R, 0, Math.PI * 2);
-        ctx.fillStyle = lv.coinColor;
+        ctx.roundRect(bx, by, bw, bh, 4);
         ctx.fill();
+
+        /* border */
+        ctx.shadowBlur  = 0;
+        ctx.strokeStyle = lv.skillColor;
+        ctx.lineWidth   = 1.5;
         ctx.beginPath();
-        ctx.arc(-2, -2, COIN_R * 0.42, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255,255,255,0.55)";
+        ctx.roundRect(bx, by, bw, bh, 4);
+        ctx.stroke();
+
+        /* small downward arrow from tooltip to icon */
+        const arrowX = Math.max(bx + 6, Math.min(bx + bw - 6, t.x));
+        ctx.fillStyle = lv.skillColor;
+        ctx.beginPath();
+        ctx.moveTo(arrowX - 5, by + bh);
+        ctx.lineTo(arrowX + 5, by + bh);
+        ctx.lineTo(arrowX,     by + bh + 5);
+        ctx.closePath();
         ctx.fill();
+
+        /* label */
+        ctx.fillStyle    = "#ffffff";
+        ctx.textBaseline = "middle";
+        ctx.textAlign    = "center";
+        ctx.fillText(t.skill, bx + bw / 2, by + bh / 2);
         ctx.restore();
       }
     }
@@ -225,21 +280,14 @@ export function useGameEngine(
     ctx.restore();
 
     /* HUD */
-    const coinsLeft     = coins.current.filter(c => !c.collected && c.type !== "mushroom").length;
-    const mushroomsLeft = coins.current.filter(c => !c.collected &&  c.type === "mushroom").length;
-    const hasAnyMushrooms = coins.current.some(c => c.type === "mushroom");
+    const skillsLeft = coins.current.filter(c => !c.collected).length;
 
     ctx.imageSmoothingEnabled = true;
     ctx.font = '10px "Press Start 2P", monospace';
     ctx.shadowColor = "#000";
     ctx.shadowBlur = 5;
-    ctx.fillStyle = "#ffd700";
-    ctx.fillText(`COINS x${coinsLeft}`, 16, 28);
-    if (hasAnyMushrooms) {
-      const coinsTextW = ctx.measureText(`COINS x${coinsLeft}`).width;
-      ctx.fillStyle = "#E02000";
-      ctx.fillText(`  MUSHROOMS x${mushroomsLeft}`, 16 + coinsTextW, 28);
-    }
+    ctx.fillStyle = lv.skillColor;
+    ctx.fillText(`SKILLS x${skillsLeft}`, 16, 28);
     const tw = ctx.measureText(lv.worldId).width;
     ctx.fillStyle = "#fff";
     ctx.fillText(lv.worldId, CANVAS_W - tw - 16, 28);
@@ -249,6 +297,15 @@ export function useGameEngine(
   useEffect(() => {
     levelRef.current = LEVELS[worldKey] ?? LEVELS.mountain;
 
+    /* preload skill icons for this level */
+    for (const c of levelRef.current.coins) {
+      if (!imgCache.current.has(c.icon)) {
+        const img = new Image();
+        img.src = c.icon;
+        imgCache.current.set(c.icon, img);
+      }
+    }
+
     const initGame = () => {
       const lv = levelRef.current;
       px.current  = lv.playerStart.x;
@@ -257,10 +314,11 @@ export function useGameEngine(
       pvy.current = 0;
       onGround.current   = false;
       facingLeft.current = false;
-      coins.current = lv.coins.map(c => ({ ...c, collected: false }));
+      coins.current   = lv.coins.map(c => ({ x: c.x, y: c.y, skill: c.skill, icon: c.icon, collected: false }));
+      tooltip.current = null;
       statusRef.current  = "playing";
       setGameState("playing");
-      setCoinsLeft(lv.coins.filter(c => c.type !== "mushroom").length);
+      setCoinsLeft(lv.coins.length);
     };
 
     resetRef.current = initGame;
@@ -291,6 +349,31 @@ export function useGameEngine(
 
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup",   onKeyUp);
+
+    /* canvas click → show/hide skill name tooltip */
+    const onCanvasClick = (e: MouseEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect   = canvas.getBoundingClientRect();
+      const scaleX = CANVAS_W / rect.width;
+      const scaleY = CANVAS_H / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top)  * scaleY;
+      const HIT_R = 22; // slightly larger than visual radius for easier clicking
+      for (const coin of coins.current) {
+        if (coin.collected) continue;
+        if (Math.hypot(mx - coin.x, my - coin.y) <= HIT_R) {
+          tooltip.current = tooltip.current?.skill === coin.skill
+            ? null
+            : { skill: coin.skill, x: coin.x, y: coin.y };
+          return;
+        }
+      }
+      tooltip.current = null; // click on empty area → dismiss
+    };
+
+    const canvasEl = canvasRef.current;
+    canvasEl?.addEventListener("click", onCanvasClick);
 
     /* main game loop */
     const loop = () => {
@@ -345,7 +428,7 @@ export function useGameEngine(
           }
         }
 
-        /* coin collection */
+        /* skill collection */
         const cx = px.current + SW / 2;
         const cy = py.current + SH / 2;
         let newlyCollected = false;
@@ -353,11 +436,12 @@ export function useGameEngine(
           if (coin.collected) continue;
           if (Math.hypot(cx - coin.x, cy - coin.y) < COIN_R + SW * 0.38) {
             coin.collected = true;
-            if (coin.type !== "mushroom") newlyCollected = true;
+            if (tooltip.current?.skill === coin.skill) tooltip.current = null;
+            newlyCollected = true;
           }
         }
         if (newlyCollected) {
-          setCoinsLeft(coins.current.filter(c => !c.collected && c.type !== "mushroom").length);
+          setCoinsLeft(coins.current.filter(c => !c.collected).length);
         }
 
         /* death — fell off the bottom */
@@ -367,7 +451,7 @@ export function useGameEngine(
           setTimeout(initGame, 1200);
         }
 
-        /* win — all coins collected */
+        /* win — all skills collected */
         if (statusRef.current === "playing" && coins.current.every(c => c.collected)) {
           statusRef.current = "won";
           setGameState("won");
@@ -388,6 +472,7 @@ export function useGameEngine(
       cancelAnimationFrame(rafId.current);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup",   onKeyUp);
+      canvasEl?.removeEventListener("click", onCanvasClick);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worldKey, character]);

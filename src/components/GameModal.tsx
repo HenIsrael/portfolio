@@ -99,7 +99,7 @@ export default function GameModal({
           }}
         >
           <span style={{ fontSize: 8, color: "#52ff52", letterSpacing: "0.06em" }}>
-            COLLECT ALL COINS TO WIN
+            COLLECT ALL SKILLS TO WIN
           </span>
           <button
             onClick={onClose}

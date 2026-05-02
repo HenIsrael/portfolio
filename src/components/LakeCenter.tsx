@@ -124,6 +124,8 @@ export default function LakeCenter({ onClick }: LakeCenterProps) {
         display:         "inline-block",
         transformOrigin: "center center",
       }}
+      
+      transition={{ duration: 0.55, ease: "easeOut" }}
       whileHover={{ y: -8, scale: 1.04 }}
       whileTap={{ scale: 0.96 }}
       onHoverStart={() => setHovered(true)}
