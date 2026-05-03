@@ -51,7 +51,6 @@ const PIXELS: string[][] = [
 ];
 
 export default function MarioSprite({ size = 48 }: MarioSpriteProps) {
-  const cellSize = size / 16;
   return (
     <svg
       width={size}

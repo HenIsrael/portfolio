@@ -99,7 +99,7 @@ function DpadBtn({
 }
 
 export default function GameModal({
-  worldKey, worldTitle,
+  worldKey,
   selectedCharacter, onSelectCharacter,
   onWin, onClose,
 }: GameModalProps) {
