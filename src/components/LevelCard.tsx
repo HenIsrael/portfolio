@@ -6,6 +6,30 @@ import type { IconType } from "react-icons";
 ────────────────────────────────────────────────────────────── */
 const PIX: React.CSSProperties = { imageRendering: "pixelated" };
 
+/** Tiny pixel trophy for unlocked-level badge (matches game UI). */
+function PixelTrophyIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 12 14"
+      style={{ display: "block", imageRendering: "pixelated" }}
+      shapeRendering="crispEdges"
+      aria-hidden
+    >
+      <rect x="1" y="6" width="2" height="4" fill="#b8860b" />
+      <rect x="9" y="6" width="2" height="4" fill="#b8860b" />
+      <rect x="5" y="10" width="2" height="2" fill="#d4a017" />
+      <rect x="2" y="12" width="8" height="2" fill="#5c2e00" />
+      <rect x="3" y="11" width="6" height="1" fill="#8b6914" />
+      <rect x="3" y="5" width="6" height="5" fill="#ffd700" />
+      <rect x="4" y="4" width="4" height="1" fill="#ffe566" />
+      <rect x="3" y="6" width="1" height="3" fill="#e6c200" />
+      <rect x="8" y="6" width="1" height="3" fill="#c9a415" />
+    </svg>
+  );
+}
+
 /* ── Castle ── gothic night, moonlit fortress ── */
 function CastleScene() {
   const stars: [number, number][] = [
@@ -326,6 +350,7 @@ export interface LevelCardProps {
   index: number;
   scene: keyof typeof SCENES;
   onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
+  isUnlocked?: boolean;
 }
 
 export default function LevelCard({
@@ -338,6 +363,7 @@ export default function LevelCard({
   index,
   scene,
   onGameStart,
+  isUnlocked = false,
 }: LevelCardProps) {
   const SceneComp = SCENES[scene];
   const levelId   = LEVEL_IDS[scene];
@@ -458,6 +484,19 @@ export default function LevelCard({
           }}
         >
           <Icon size={22} color="#000" />
+          {isUnlocked && (
+            <div
+              style={{
+                position:   "absolute",
+                top:        -8,
+                right:      -6,
+                filter:     "drop-shadow(1px 2px 0 rgba(0,0,0,0.55))",
+              }}
+              aria-hidden
+            >
+              <PixelTrophyIcon size={22} />
+            </div>
+          )}
         </div>
 
         {/* Scene pushed down so icon badge has visual space above it */}

@@ -8,6 +8,7 @@ import type { LevelCardProps } from "./LevelCard";
 interface CardGridProps {
   onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
   onLakeClick: () => void;
+  unlockedLevels: Set<string>;
 }
 
 type CardData = Omit<LevelCardProps, "index" | "onGameStart"> & {
@@ -75,7 +76,7 @@ const POSITIONS: PositionSlot[] = [
   { card: cards[3], col: 5, row: 3 },                    // SafrSight — middle right
 ];
 
-export default function CardGrid({ onGameStart, onLakeClick }: CardGridProps) {
+export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: CardGridProps) {
   return (
     <section className="mx-auto -mt-10 w-full max-w-4xl px-4 pb-2">
       <div
@@ -112,6 +113,7 @@ export default function CardGrid({ onGameStart, onLakeClick }: CardGridProps) {
               isResume={card.isResume}
               scene={card.scene}
               onGameStart={onGameStart}
+              isUnlocked={unlockedLevels.has(card.scene)}
             />
           </div>
         ))}

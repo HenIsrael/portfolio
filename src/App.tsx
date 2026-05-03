@@ -43,11 +43,18 @@ export default function App() {
   const [selectedCharacter, setSelectedCharacter] = useState<string>("mario");
   const [gameMode, setGameMode] = useState<GameMode>("view");
   const [pendingWorld, setPendingWorld] = useState<PendingWorld | null>(null);
+  const [unlockedLevels, setUnlockedLevels] = useState<Set<string>>(new Set());
 
   const zoom = useViewportZoom();
 
   const handleGameStart = (scene: string, href?: string, isResume?: boolean) => {
     if (gameMode === "view") {
+      if (isResume) setResumeOpen(true);
+      else if (href) window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    // Already unlocked — skip the game and go straight to the link
+    if (unlockedLevels.has(scene)) {
       if (isResume) setResumeOpen(true);
       else if (href) window.open(href, "_blank", "noopener,noreferrer");
       return;
@@ -63,7 +70,8 @@ export default function App() {
 
   const handleWin = () => {
     if (!pendingWorld) return;
-    const { href, isResume } = pendingWorld;
+    const { worldKey, href, isResume } = pendingWorld;
+    setUnlockedLevels(prev => new Set(prev).add(worldKey));
     setPendingWorld(null);
     if (isResume) setResumeOpen(true);
     else if (href) window.open(href, "_blank", "noopener,noreferrer");
@@ -82,7 +90,7 @@ export default function App() {
           gameMode={gameMode}
           onToggleMode={() => setGameMode(m => m === "view" ? "play" : "view")}
         />
-        <CardGrid onGameStart={handleGameStart} onLakeClick={() => setBioOpen(true)} />
+        <CardGrid onGameStart={handleGameStart} onLakeClick={() => setBioOpen(true)} unlockedLevels={unlockedLevels} />
         <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
         <BioModal isOpen={bioOpen} onClose={() => setBioOpen(false)} />
       </main>

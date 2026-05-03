@@ -135,7 +135,7 @@ export default function Hero({ gameMode, onToggleMode }: HeroProps) {
                 lineHeight: 1.4,
               }}
             >
-              HEN ISRAEL
+              HEN-ORI ISRAEL
             </h1>
             <p
               style={{
