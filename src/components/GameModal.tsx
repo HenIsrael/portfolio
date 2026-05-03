@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
@@ -8,6 +8,23 @@ import CookieMonsterSprite from "./characters/CookieMonsterSprite";
 const isTouchDevice =
   typeof window !== "undefined" &&
   ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+/** Returns the current inner height and re-renders on orientation/resize. */
+function useViewportHeight(): number {
+  const [h, setH] = useState(() =>
+    typeof window !== "undefined" ? window.innerHeight : 900
+  );
+  useEffect(() => {
+    const update = () => setH(window.innerHeight);
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
+  return h;
+}
 
 interface GameModalProps {
   worldKey: string;
@@ -105,6 +122,17 @@ export default function GameModal({
 }: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { gameState, keysRef } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
+  const viewportH = useViewportHeight();
+
+  // In landscape on a phone the viewport is ~390 px tall.
+  // Reserve space for top strip (~32px), hint bar (~30px), d-pad (~92px),
+  // borders/gaps (~20px) → 174px of non-canvas chrome.
+  // Constrain the canvas maxWidth so everything fits without scrolling.
+  const NON_CANVAS_H = 174;
+  const isLandscapePhone = isTouchDevice && viewportH < 500;
+  const canvasMaxWidth = isLandscapePhone
+    ? `min(${Math.floor(Math.max(120, viewportH - NON_CANVAS_H) * (CANVAS_W / CANVAS_H))}px, calc(100vw - 32px))`
+    : "min(800px, calc(100vw - 32px))";
 
   return (
     <motion.div
@@ -188,7 +216,7 @@ export default function GameModal({
             height={CANVAS_H}
             style={{
               display:        "block",
-              maxWidth:       "min(800px, calc(100vw - 32px))",
+              maxWidth:       canvasMaxWidth,
               width:          "100%",
               height:         "auto",
               imageRendering: "pixelated",

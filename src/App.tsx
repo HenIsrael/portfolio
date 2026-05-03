@@ -26,6 +26,16 @@ function useViewportZoom(designHeight = 950, minZoom = 0.65): number {
 
   useEffect(() => {
     const update = () => {
+      // On touch/mobile devices the CSS zoom property interferes with the
+      // viewport and fixed-position overlays — skip it entirely.
+      const isMobile =
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth < 768;
+      if (isMobile) {
+        setZoom(1);
+        return;
+      }
       const z = Math.min(1, window.innerHeight / designHeight);
       setZoom(Math.max(minZoom, z));
     };
