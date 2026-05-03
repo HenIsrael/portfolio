@@ -230,9 +230,14 @@ export default function GameModal({
           <div
             style={{
               position:       "absolute",
-              top:            12,
+              top:            isLandscapePhone ? 6 : 12,
               left:           "50%",
-              transform:      "translateX(-50%)",
+              // In landscape phone the canvas is ~216 px tall; scale the
+              // overlay down so it doesn't eat half the play area.
+              transform:      isLandscapePhone
+                ? "translateX(-50%) scale(0.6)"
+                : "translateX(-50%)",
+              transformOrigin: "top center",
               zIndex:         20,
               display:        "flex",
               flexDirection:  "column",
