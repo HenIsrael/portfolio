@@ -220,9 +220,9 @@ export default function LakeCenter({ onClick }: LakeCenterProps) {
           <rect x={CX-65} y={CY-6} width={130} height={16} fill="rgba(0,0,0,0.62)" clipPath="url(#lkClip)" />
           {/* text outline via shadow rect trick — white text on dark bg */}
           <text x={CX+1} y={CY+6} textAnchor="middle" fill="#000000"
-            fontSize={6} fontFamily="'Press Start 2P', monospace" opacity={0.6}>The Lake Of Knowlage</text>
+            fontSize={6} fontFamily="'Press Start 2P', monospace" opacity={0.6}>The Lake Of Knowledge</text>
           <text x={CX}   y={CY+5} textAnchor="middle" fill="white"
-            fontSize={6} fontFamily="'Press Start 2P', monospace">The Lake Of Knowlage</text>
+            fontSize={6} fontFamily="'Press Start 2P', monospace">The Lake Of Knowledge</text>
           </g>
 
           {/* Click + hover target — adjust CLICK_HIT_SCALE above to resize */}
