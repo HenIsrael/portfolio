@@ -5,6 +5,10 @@ import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
 import MarioSprite from "./characters/MarioSprite";
 import CookieMonsterSprite from "./characters/CookieMonsterSprite";
 
+const isTouchDevice =
+  typeof window !== "undefined" &&
+  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
 interface GameModalProps {
   worldKey: string;
   worldTitle: string;
@@ -49,13 +53,58 @@ function Heart({ size = 32 }: { size?: number }) {
   );
 }
 
+function DpadBtn({
+  label,
+  wide,
+  onActivate,
+  onDeactivate,
+}: {
+  label: string;
+  wide?: boolean;
+  onActivate: () => void;
+  onDeactivate: () => void;
+}) {
+  return (
+    <button
+      aria-label={label}
+      style={{
+        width:           wide ? 80 : 60,
+        height:          60,
+        background:      "rgba(255,215,0,0.08)",
+        border:          "3px solid #c88000",
+        boxShadow:       "0 0 0 3px #5c2e00, 3px 3px 0 rgba(0,0,0,0.55)",
+        color:           "#ffd700",
+        fontSize:        26,
+        fontFamily:      FONT,
+        cursor:          "pointer",
+        display:         "flex",
+        alignItems:      "center",
+        justifyContent:  "center",
+        touchAction:     "none",
+        userSelect:      "none",
+        WebkitUserSelect: "none",
+        outline:         "none",
+        padding:         0,
+        flexShrink:      0,
+        transition:      "background 0.1s",
+      }}
+      onPointerDown={(e) => { e.preventDefault(); (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,215,0,0.25)"; onActivate(); }}
+      onPointerUp={(e)   => { e.preventDefault(); (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,215,0,0.08)"; onDeactivate(); }}
+      onPointerLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,215,0,0.08)"; onDeactivate(); }}
+      onPointerCancel={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,215,0,0.08)"; onDeactivate(); }}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function GameModal({
   worldKey, worldTitle,
   selectedCharacter, onSelectCharacter,
   onWin, onClose,
 }: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { gameState } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
+  const { gameState, keysRef } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
 
   return (
     <motion.div
@@ -336,7 +385,7 @@ export default function GameModal({
             background: "rgba(0,0,0,0.85)",
             border: "4px solid #c88000",
             borderTop: "none",
-            boxShadow: "0 0 0 4px #5c2e00",
+            boxShadow: isTouchDevice ? "none" : "0 0 0 4px #5c2e00",
             padding: "8px 16px",
             display: "flex",
             alignItems: "center",
@@ -345,29 +394,81 @@ export default function GameModal({
             flexWrap: "wrap",
           }}
         >
-          {[
-            { keys: "← →",             action: "MOVE" },
-            { keys: "SPACE / W / ↑",   action: "JUMP" },
-          ].map(({ keys: k, action }, i) => (
-            <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span
-                style={{
-                  fontSize: 8,
-                  color: "#ffd700",
-                  letterSpacing: "0.04em",
-                  background: "rgba(255,255,255,0.1)",
-                  border: "2px solid #555",
-                  padding: "2px 6px",
-                }}
-              >
-                {k}
-              </span>
-              <span style={{ fontSize: 7, color: "#aaa", letterSpacing: "0.04em" }}>
-                {action}
-              </span>
+          {isTouchDevice ? (
+            <span style={{ fontSize: 7, color: "#aaa", letterSpacing: "0.06em" }}>
+              USE BUTTONS BELOW TO MOVE &amp; JUMP
             </span>
-          ))}
+          ) : (
+            [
+              { keys: "← →",           action: "MOVE" },
+              { keys: "SPACE / W / ↑", action: "JUMP" },
+            ].map(({ keys: k, action }, i) => (
+              <span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span
+                  style={{
+                    fontSize: 8,
+                    color: "#ffd700",
+                    letterSpacing: "0.04em",
+                    background: "rgba(255,255,255,0.1)",
+                    border: "2px solid #555",
+                    padding: "2px 6px",
+                  }}
+                >
+                  {k}
+                </span>
+                <span style={{ fontSize: 7, color: "#aaa", letterSpacing: "0.04em" }}>
+                  {action}
+                </span>
+              </span>
+            ))
+          )}
         </div>
+
+        {/* Virtual D-pad — touch devices only */}
+        {isTouchDevice && (
+          <div
+            style={{
+              background:      "rgba(0,0,0,0.85)",
+              border:          "4px solid #c88000",
+              borderTop:       "none",
+              boxShadow:       "0 0 0 4px #5c2e00",
+              padding:         "14px 20px",
+              display:         "flex",
+              alignItems:      "center",
+              justifyContent:  "space-between",
+            }}
+          >
+            {/* Left / Right */}
+            <div style={{ display: "flex", gap: 10 }}>
+              <DpadBtn
+                label="◀"
+                onActivate={() => { keysRef.current.left  = true;  }}
+                onDeactivate={() => { keysRef.current.left  = false; }}
+              />
+              <DpadBtn
+                label="▶"
+                onActivate={() => { keysRef.current.right = true;  }}
+                onDeactivate={() => { keysRef.current.right = false; }}
+              />
+            </div>
+
+            {/* Jump */}
+            <DpadBtn
+              label="▲"
+              wide
+              onActivate={() => {
+                if (!keysRef.current.held) {
+                  keysRef.current.jump = true;
+                  keysRef.current.held = true;
+                }
+              }}
+              onDeactivate={() => {
+                keysRef.current.jump = false;
+                keysRef.current.held = false;
+              }}
+            />
+          </div>
+        )}
       </motion.div>
     </motion.div>
   );

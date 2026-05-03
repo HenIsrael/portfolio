@@ -477,5 +477,5 @@ export function useGameEngine(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [worldKey, character]);
 
-  return { gameState, coinsLeft, resetGame: () => resetRef.current() };
+  return { gameState, coinsLeft, resetGame: () => resetRef.current(), keysRef: keys };
 }
