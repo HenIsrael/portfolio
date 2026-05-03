@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { FaGithub } from "react-icons/fa";
 import { SiHuggingface } from "react-icons/si";
 import { HiDocumentText } from "react-icons/hi2";
@@ -5,6 +6,25 @@ import { MdSecurity } from "react-icons/md";
 import LevelCard from "./LevelCard";
 import LakeCenter from "./LakeCenter";
 import type { LevelCardProps } from "./LevelCard";
+
+/** Scales the card grid down on narrow viewports so 200 px LevelCards
+ *  never overflow horizontally (which would widen the layout viewport and
+ *  push fixed overlays like RotatePrompt off-screen). */
+function useGridScale(designWidth = 900, minScale = 0.44): number {
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const update = () =>
+      setScale(Math.min(1, Math.max(minScale, window.innerWidth / designWidth)));
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, [designWidth, minScale]);
+  return scale;
+}
 interface CardGridProps {
   onGameStart: (scene: string, href?: string, isResume?: boolean) => void;
   onLakeClick: () => void;
@@ -77,8 +97,15 @@ const POSITIONS: PositionSlot[] = [
 ];
 
 export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: CardGridProps) {
+  const scale = useGridScale();
   return (
-    <section className="mx-auto -mt-10 w-full max-w-4xl px-4 pb-2">
+    <section
+      className="mx-auto -mt-10 w-full max-w-4xl px-4 pb-2"
+      style={{
+        transform:       scale < 1 ? `scale(${scale})` : undefined,
+        transformOrigin: "top center",
+      }}
+    >
       <div
         style={{
           display:             "grid",
