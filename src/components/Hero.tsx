@@ -33,6 +33,7 @@ export default function Hero({ gameMode, onToggleMode }: HeroProps) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
+      style={{ position: "relative", zIndex: 5 }}
     >
       {/* Pixel score-board panel */}
       <div

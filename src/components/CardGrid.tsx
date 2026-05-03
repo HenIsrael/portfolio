@@ -116,8 +116,6 @@ export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: C
           gridTemplateRows:    "auto auto auto auto auto",
           rowGap:              "0px",
           columnGap:           "0px",
-          // Re-enable pointer events for the actual grid content.
-          pointerEvents:       "auto",
         }}
       >
         {POSITIONS.map(({ card, col, row, offsetX, offsetY }, i) => (
@@ -133,6 +131,8 @@ export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: C
               top:             offsetY ?? 0,
               /* Above the lake so footer / ? block stays clickable when offsets overlap the lake */
               zIndex:          2,
+              // Restore pointer events only for each individual card cell.
+              pointerEvents:   "auto",
             }}
           >
             <LevelCard
@@ -160,6 +160,7 @@ export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: C
             justifyContent: "center",
             position:       "relative",
             zIndex:         0,
+            pointerEvents:  "auto",
           }}
         >
           <LakeCenter onClick={onLakeClick} />
