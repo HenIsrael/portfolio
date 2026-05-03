@@ -104,6 +104,9 @@ export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: C
       style={{
         transform:       scale < 1 ? `scale(${scale})` : undefined,
         transformOrigin: "top center",
+        // Prevent the scaled section's hit area from overlapping the Hero
+        // above it and stealing taps from the mode-toggle button.
+        pointerEvents:   "none",
       }}
     >
       <div
@@ -113,6 +116,8 @@ export default function CardGrid({ onGameStart, onLakeClick, unlockedLevels }: C
           gridTemplateRows:    "auto auto auto auto auto",
           rowGap:              "0px",
           columnGap:           "0px",
+          // Re-enable pointer events for the actual grid content.
+          pointerEvents:       "auto",
         }}
       >
         {POSITIONS.map(({ card, col, row, offsetX, offsetY }, i) => (
