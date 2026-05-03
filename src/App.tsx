@@ -91,9 +91,10 @@ export default function App() {
           onToggleMode={() => setGameMode(m => m === "view" ? "play" : "view")}
         />
         <CardGrid onGameStart={handleGameStart} onLakeClick={() => setBioOpen(true)} unlockedLevels={unlockedLevels} />
-        <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
-        <BioModal isOpen={bioOpen} onClose={() => setBioOpen(false)} />
       </main>
+
+      <ResumeModal isOpen={resumeOpen} onClose={() => setResumeOpen(false)} />
+      <BioModal isOpen={bioOpen} onClose={() => setBioOpen(false)} />
 
       <AnimatePresence>
         {pendingWorld && (
