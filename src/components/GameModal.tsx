@@ -1,9 +1,15 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
 import MarioSprite from "./characters/MarioSprite";
 import CookieMonsterSprite from "./characters/CookieMonsterSprite";
+
+const CANVAS_BORDER_PX = 4;
+/** Canvas Y for top of hearts row (below `SKILLS x…` drawn at baseline 28 with 10px font). */
+const HEARTS_HUD_TOP_Y = 40;
+/** First filled pixel in Heart viewBox is x=3 — shift left so artwork lines up with HUD text at x=16. */
+const HEART_VIEWBOX_LEFT_GUTTER = 3 / 16;
 
 function useIsTouchDevice(): boolean {
   const check = () =>
@@ -119,15 +125,29 @@ export default function GameModal({
   const { gameState, keysRef } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
   const isTouchDevice = useIsTouchDevice();
 
+  /** Match on-canvas HUD scale so hearts track `SKILLS x…` (10px in 800px-wide bitmap). */
+  const [hudPxPerCanvasPx, setHudPxPerCanvasPx] = useState(1);
+  useLayoutEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const update = () => setHudPxPerCanvasPx(canvas.clientWidth / CANVAS_W);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(canvas);
+    return () => ro.disconnect();
+  }, []);
+  const heartSize = Math.max(12, Math.round(22 * hudPxPerCanvasPx));
+  const heartsOpticalShiftX = -HEART_VIEWBOX_LEFT_GUTTER * heartSize;
+
   // Pure-CSS canvas constraint — no JS viewport measurement needed.
   // The third term limits the canvas width so its height never exceeds
-  // (100svh − 190px), where 190px covers: outer padding (32) + top strip
-  // (30) + canvas borders (8) + hint bar (28) + d-pad (92).
-  // svh = SMALL viewport height (fixed to the viewport size with URL bar
-  // visible). Using svh instead of dvh means the canvas never resizes
-  // while the user scrolls and the URL bar appears/disappears.
+  // (100svh − 142px), where 142px covers: outer padding (32) + top strip
+  // (30) + canvas borders (8) + d-pad buttons (60) + d-pad padding (8) +
+  // d-pad border (4). Hint bar removed on touch; d-pad padding tightened.
+  // svh = SMALL viewport height — never changes on scroll, so the canvas
+  // stays a stable size while the URL bar appears/disappears.
   const canvasMaxWidth =
-    `min(${CANVAS_W}px, calc(100vw - 32px), calc((100svh - 190px) * ${CANVAS_W} / ${CANVAS_H}))`;
+    `min(${CANVAS_W}px, calc(100vw - 32px), calc((100svh - 142px) * ${CANVAS_W} / ${CANVAS_H}))`;
 
   return (
     <motion.div
@@ -302,13 +322,25 @@ export default function GameModal({
                 );
               })}
             </div>
+          </div>
 
-            {/* 3 smooth SVG hearts */}
-            <div style={{ display: "flex", gap: 8 }}>
-              {[0, 1, 2].map((i) => (
-                <Heart key={i} />
-              ))}
-            </div>
+          {/* Lives — left-aligned with canvas HUD `SKILLS x…` (x=16), scale matches scaled canvas */}
+          <div
+            style={{
+              position:        "absolute",
+              left:            `calc(${CANVAS_BORDER_PX}px + (100% - ${CANVAS_BORDER_PX * 2}px) * ${16} / ${CANVAS_W})`,
+              top:             `calc(${CANVAS_BORDER_PX}px + (100% - ${CANVAS_BORDER_PX * 2}px) * ${HEARTS_HUD_TOP_Y} / ${CANVAS_H})`,
+              transform:       `translateX(${heartsOpticalShiftX}px)`,
+              zIndex:          20,
+              display:         "flex",
+              alignItems:      "flex-start",
+              gap:             Math.max(1, Math.round(6 * hudPxPerCanvasPx)),
+              pointerEvents:   "none",
+            }}
+          >
+            {[0, 1, 2].map((i) => (
+              <Heart key={i} size={heartSize} />
+            ))}
           </div>
 
           {/* ── State overlays ── */}
@@ -405,28 +437,24 @@ export default function GameModal({
           </AnimatePresence>
         </div>
 
-        {/* Controls hint bar */}
-        <div
-          style={{
-            fontFamily: FONT,
-            background: "rgba(0,0,0,0.85)",
-            border: "4px solid #c88000",
-            borderTop: "none",
-            boxShadow: isTouchDevice ? "none" : "0 0 0 4px #5c2e00",
-            padding: "8px 16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "clamp(12px, 2vw, 32px)",
-            flexWrap: "wrap",
-          }}
-        >
-          {isTouchDevice ? (
-            <span style={{ fontSize: 7, color: "#aaa", letterSpacing: "0.06em" }}>
-              USE BUTTONS BELOW TO MOVE &amp; JUMP
-            </span>
-          ) : (
-            [
+        {/* Controls hint bar — desktop only; removed on touch to save space */}
+        {!isTouchDevice && (
+          <div
+            style={{
+              fontFamily: FONT,
+              background: "rgba(0,0,0,0.85)",
+              border: "4px solid #c88000",
+              borderTop: "none",
+              boxShadow: "0 0 0 4px #5c2e00",
+              padding: "8px 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "clamp(12px, 2vw, 32px)",
+              flexWrap: "wrap",
+            }}
+          >
+            {[
               { keys: "← →",           action: "MOVE" },
               { keys: "SPACE / W / ↑", action: "JUMP" },
             ].map(({ keys: k, action }, i) => (
@@ -447,9 +475,9 @@ export default function GameModal({
                   {action}
                 </span>
               </span>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Virtual D-pad — touch devices only */}
         {isTouchDevice && (
@@ -459,7 +487,7 @@ export default function GameModal({
               border:          "4px solid #c88000",
               borderTop:       "none",
               boxShadow:       "0 0 0 4px #5c2e00",
-              padding:         "14px 20px",
+              padding:         "4px 8px",
               display:         "flex",
               alignItems:      "center",
               justifyContent:  "space-between",
