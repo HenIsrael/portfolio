@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
@@ -8,36 +8,6 @@ import CookieMonsterSprite from "./characters/CookieMonsterSprite";
 const isTouchDevice =
   typeof window !== "undefined" &&
   ("ontouchstart" in window || navigator.maxTouchPoints > 0);
-
-/** Returns the current visible viewport height and re-renders on any change.
- *  Subscribes to window resize, orientationchange, AND visualViewport resize
- *  (which fires when the mobile URL bar appears/disappears on scroll).
- *  A deferred re-check on mount handles the race where the component mounts
- *  before the browser has settled the new orientation dimensions. */
-function useViewportHeight(): number {
-  const [h, setH] = useState(() =>
-    typeof window !== "undefined" ? window.innerHeight : 900
-  );
-  useEffect(() => {
-    const update = () =>
-      setH(window.visualViewport?.height ?? window.innerHeight);
-
-    // Deferred re-check: orientation may not be fully settled at mount time.
-    const tid = setTimeout(update, 0);
-
-    window.addEventListener("resize", update);
-    window.addEventListener("orientationchange", update);
-    window.visualViewport?.addEventListener("resize", update);
-
-    return () => {
-      clearTimeout(tid);
-      window.removeEventListener("resize", update);
-      window.removeEventListener("orientationchange", update);
-      window.visualViewport?.removeEventListener("resize", update);
-    };
-  }, []);
-  return h;
-}
 
 interface GameModalProps {
   worldKey: string;
@@ -135,17 +105,15 @@ export default function GameModal({
 }: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { gameState, keysRef } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
-  const viewportH = useViewportHeight();
 
-  // In landscape on a phone the viewport is ~390 px tall.
-  // Reserve space for top strip (~32px), hint bar (~30px), d-pad (~92px),
-  // borders/gaps (~20px) → 174px of non-canvas chrome.
-  // Constrain the canvas maxWidth so everything fits without scrolling.
-  const NON_CANVAS_H = 174;
-  const isLandscapePhone = isTouchDevice && viewportH < 500;
-  const canvasMaxWidth = isLandscapePhone
-    ? `min(${Math.floor(Math.max(120, viewportH - NON_CANVAS_H) * (CANVAS_W / CANVAS_H))}px, calc(100vw - 32px))`
-    : "min(800px, calc(100vw - 32px))";
+  // Pure-CSS canvas constraint — no JS viewport measurement needed.
+  // The third term limits the canvas width so its height never exceeds
+  // (100dvh − 190px), where 190px covers: outer padding (32) + top strip
+  // (30) + canvas borders (8) + hint bar (28) + d-pad (92).
+  // dvh = dynamic viewport height: updates instantly when the URL bar
+  // appears/disappears or orientation settles — no timing race possible.
+  const canvasMaxWidth =
+    `min(${CANVAS_W}px, calc(100vw - 32px), calc((100dvh - 190px) * ${CANVAS_W} / ${CANVAS_H}))`;
 
   return (
     <motion.div
@@ -239,23 +207,22 @@ export default function GameModal({
             }}
           />
 
-          {/* Character selector — floating overlay centred at top of canvas */}
+          {/* Character selector — floating overlay centred at top of canvas.
+              CSS variables --game-overlay-top / --game-overlay-scale are set
+              via a @media rule in index.css so the overlay shrinks
+              automatically in landscape phone mode (no JS timing race). */}
           <div
             style={{
-              position:       "absolute",
-              top:            isLandscapePhone ? 6 : 12,
-              left:           "50%",
-              // In landscape phone the canvas is ~216 px tall; scale the
-              // overlay down so it doesn't eat half the play area.
-              transform:      isLandscapePhone
-                ? "translateX(-50%) scale(0.6)"
-                : "translateX(-50%)",
+              position:        "absolute",
+              top:             "var(--game-overlay-top, 12px)",
+              left:            "50%",
+              transform:       "translateX(-50%) scale(var(--game-overlay-scale, 1))",
               transformOrigin: "top center",
-              zIndex:         20,
-              display:        "flex",
-              flexDirection:  "column",
-              alignItems:     "center",
-              gap:            6,
+              zIndex:          20,
+              display:         "flex",
+              flexDirection:   "column",
+              alignItems:      "center",
+              gap:             6,
             }}
           >
             {/* Character buttons row */}
