@@ -154,13 +154,39 @@ export default function Hero({ gameMode, onToggleMode }: HeroProps) {
         </div>
 
         {/* Divider */}
-        <div style={{ height: 3, background: "#c88000", margin: "1.5rem 0" }} />
+        <div style={{ height: 3, background: "#c88000", margin: "1rem 0" }} />
 
         {/* Mode toggle */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
           <GameModeToggle mode={gameMode} onToggle={onToggleMode} />
         </div>
       </div>
+
+      {/* Hint text below the frame */}
+      <p
+        style={{
+          fontFamily: '"Press Start 2P", monospace',
+          fontSize: 11,
+          color: "#fff",
+          letterSpacing: "0.05em",
+          margin: "12px auto 0",
+          maxWidth: 440,
+          lineHeight: 2,
+          textShadow: "0 0 20px #c8800088, 2px 2px 0 rgba(0,0,0,0.8)",
+          textAlign: "center",
+        }}
+      >
+        Explore worlds in{" "}
+        <span
+          style={{
+            textShadow: "0 0 14px #ff6060, 2px 2px 0 rgba(0,0,0,0.8)",
+            color: "#ff6060",
+          }}
+        >
+          Game Mode
+        </span>{" "}
+        and collect skills to unlock their links
+      </p>
     </motion.section>
   );
 }

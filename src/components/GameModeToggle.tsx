@@ -18,10 +18,10 @@ export default function GameModeToggle({ mode, onToggle }: GameModeToggleProps) 
       }
       style={{
         fontFamily:  '"Press Start 2P", monospace',
-        fontSize:    9,
+        fontSize:    11,
         color:       isPlay ? "#ff6060" : "#52ff52",
         letterSpacing: "0.1em",
-        animation:   "marioBlink 1.1s step-end infinite",
+        animation:   "marioBlink 2s step-end infinite",
         margin:      0,
         background:  "none",
         border:      "none",
@@ -29,7 +29,7 @@ export default function GameModeToggle({ mode, onToggle }: GameModeToggleProps) 
         padding:     0,
       }}
     >
-      {isPlay ? "▼ SWITCH TO VIEW MODE ▼" : "▼ SWITCH TO PLAY MODE ▼"}
+      {isPlay ? "▼ GAME MODE ▼" : "▼ VIEW MODE ▼"}
     </button>
   );
 }

@@ -271,53 +271,29 @@ export default function GameModal({
                     title={char.locked ? "Coming soon" : `Play as ${char.label}`}
                     style={{
                       display:        "flex",
-                      flexDirection:  "column",
                       alignItems:     "center",
                       justifyContent: "center",
-                      gap:            3,
-                      width:          80,
-                      height:         80,
+                      width:          72,
+                      height:         72,
                       background:     isSelected ? "rgba(255,215,0,0.15)" : "transparent",
                       border:         isSelected ? "2px solid #ffd700" : "2px solid #555",
                       boxShadow:      isSelected ? "0 0 0 2px #c88000, 0 0 14px rgba(255,215,0,0.4)" : "none",
-                      padding:        "4px 0",
+                      padding:        0,
                       cursor:         char.locked ? "not-allowed" : "pointer",
                       opacity:        char.locked ? 0.3 : 1,
                       transition:     "border 0.15s, box-shadow 0.15s, background 0.15s",
                       outline:        "none",
                       imageRendering: "pixelated",
-                      fontFamily:     FONT,
                       flexShrink:     0,
                     }}
                   >
-                    <div style={{ width: 32, height: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      {char.locked ? (
-                        <span style={{ filter: "grayscale(1)", fontSize: 18 }}>🔒</span>
-                      ) : char.id === "cookie-monster" ? (
-                        <CookieMonsterSprite size={32} />
-                      ) : (
-                        <MarioSprite size={32} />
-                      )}
-                    </div>
-                    <span
-                      style={{
-                        fontSize:    6,
-                        color:       isSelected ? "#ffd700" : "#666",
-                        letterSpacing: "0.05em",
-                        textAlign:   "center",
-                        lineHeight:  1.4,
-                        height:      16,
-                        overflow:    "hidden",
-                        display:     "flex",
-                        flexDirection: "column",
-                        alignItems:  "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {char.label.split(" ").map((word, i) => (
-                        <div key={i}>{word}</div>
-                      ))}
-                    </span>
+                    {char.locked ? (
+                      <span style={{ filter: "grayscale(1)", fontSize: 22 }}>🔒</span>
+                    ) : char.id === "cookie-monster" ? (
+                      <CookieMonsterSprite size={52} />
+                    ) : (
+                      <MarioSprite size={52} />
+                    )}
                   </button>
                 );
               })}
@@ -334,7 +310,7 @@ export default function GameModal({
               zIndex:          20,
               display:         "flex",
               alignItems:      "flex-start",
-              gap:             Math.max(1, Math.round(6 * hudPxPerCanvasPx)),
+              gap:             Math.max(4, Math.round(6 * hudPxPerCanvasPx)),
               pointerEvents:   "none",
             }}
           >
