@@ -1,13 +1,25 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useGameEngine, CANVAS_W, CANVAS_H } from "../game/useGameEngine";
 import MarioSprite from "./characters/MarioSprite";
 import CookieMonsterSprite from "./characters/CookieMonsterSprite";
 
-const isTouchDevice =
-  typeof window !== "undefined" &&
-  ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+function useIsTouchDevice(): boolean {
+  const check = () =>
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+  const [isTouch, setIsTouch] = useState(check);
+
+  useEffect(() => {
+    const update = () => setIsTouch(check());
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  return isTouch;
+}
 
 interface GameModalProps {
   worldKey: string;
@@ -105,15 +117,17 @@ export default function GameModal({
 }: GameModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { gameState, keysRef } = useGameEngine(canvasRef, worldKey, onWin, selectedCharacter);
+  const isTouchDevice = useIsTouchDevice();
 
   // Pure-CSS canvas constraint — no JS viewport measurement needed.
   // The third term limits the canvas width so its height never exceeds
-  // (100dvh − 190px), where 190px covers: outer padding (32) + top strip
+  // (100svh − 190px), where 190px covers: outer padding (32) + top strip
   // (30) + canvas borders (8) + hint bar (28) + d-pad (92).
-  // dvh = dynamic viewport height: updates instantly when the URL bar
-  // appears/disappears or orientation settles — no timing race possible.
+  // svh = SMALL viewport height (fixed to the viewport size with URL bar
+  // visible). Using svh instead of dvh means the canvas never resizes
+  // while the user scrolls and the URL bar appears/disappears.
   const canvasMaxWidth =
-    `min(${CANVAS_W}px, calc(100vw - 32px), calc((100dvh - 190px) * ${CANVAS_W} / ${CANVAS_H}))`;
+    `min(${CANVAS_W}px, calc(100vw - 32px), calc((100svh - 190px) * ${CANVAS_W} / ${CANVAS_H}))`;
 
   return (
     <motion.div
