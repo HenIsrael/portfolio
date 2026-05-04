@@ -9,18 +9,31 @@ const isTouchDevice =
   typeof window !== "undefined" &&
   ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 
-/** Returns the current inner height and re-renders on orientation/resize. */
+/** Returns the current visible viewport height and re-renders on any change.
+ *  Subscribes to window resize, orientationchange, AND visualViewport resize
+ *  (which fires when the mobile URL bar appears/disappears on scroll).
+ *  A deferred re-check on mount handles the race where the component mounts
+ *  before the browser has settled the new orientation dimensions. */
 function useViewportHeight(): number {
   const [h, setH] = useState(() =>
     typeof window !== "undefined" ? window.innerHeight : 900
   );
   useEffect(() => {
-    const update = () => setH(window.innerHeight);
+    const update = () =>
+      setH(window.visualViewport?.height ?? window.innerHeight);
+
+    // Deferred re-check: orientation may not be fully settled at mount time.
+    const tid = setTimeout(update, 0);
+
     window.addEventListener("resize", update);
     window.addEventListener("orientationchange", update);
+    window.visualViewport?.addEventListener("resize", update);
+
     return () => {
+      clearTimeout(tid);
       window.removeEventListener("resize", update);
       window.removeEventListener("orientationchange", update);
+      window.visualViewport?.removeEventListener("resize", update);
     };
   }, []);
   return h;
